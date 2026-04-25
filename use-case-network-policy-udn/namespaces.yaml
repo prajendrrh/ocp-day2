@@ -1,7 +1,0 @@
-# Single namespace on one UDN. Server and client in same namespace; NetworkPolicy allows only client → server.
-apiVersion: v1
-kind: Namespace
-metadata:
-  name: np-udn-demo
-  labels:
-    k8s.ovn.org/primary-user-defined-network: ""

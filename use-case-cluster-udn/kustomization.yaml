@@ -1,6 +1,0 @@
-# Cluster UDN (multi-namespace shared network)
-# Create namespaces first, then CUDN, then deployments (cluster-admin for CUDN).
-resources:
-  - namespaces.yaml
-  - cluster-udn.yaml
-  - deployments.yaml
