@@ -2,6 +2,8 @@
 
 This repository is a structured proof of concept (PoC) for **OpenShift Day 2 operations**. Each folder is a self-contained, step-by-step mini-runbook with the minimal manifests and `oc` commands needed to demonstrate an operational task end-to-end.
 
+If you are looking for the **User-Defined Networks (UDN) demo manifests**, those live in a separate repository: [prajendrrh/udn-demo](https://github.com/prajendrrh/udn-demo).
+
 ## Environment
 
 - OpenShift: (fill in once chosen)
