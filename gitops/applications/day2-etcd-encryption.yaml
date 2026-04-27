@@ -1,0 +1,15 @@
+# Manual sync: enabling etcd encryption is high-impact; sync deliberately after change windows and backups.
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: day2-etcd-encryption
+  namespace: openshift-gitops
+spec:
+  project: day2-ops
+  source:
+    repoURL: https://github.com/example/ocp-day2.git
+    targetRevision: main
+    path: clusters/all/etcd-encryption
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: openshift-gitops

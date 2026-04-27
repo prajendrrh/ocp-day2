@@ -1,0 +1,18 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: day2-ntp-chrony
+  namespace: openshift-gitops
+spec:
+  project: day2-ops
+  source:
+    repoURL: https://github.com/example/ocp-day2.git
+    targetRevision: main
+    path: clusters/all/ntp-chrony
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: openshift-gitops
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true

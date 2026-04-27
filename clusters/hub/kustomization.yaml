@@ -1,0 +1,11 @@
+# Aggregate path for a single Argo CD Application (everything below in one sync).
+# For selective sync, use clusters/all/<component> paths from separate Applications instead.
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources:
+  - ../all/monitoring-placement
+  - ../all/ntp-chrony
+  - ../all/log-forwarding
+  # High-impact or secret-dependent — enable deliberately:
+  # - ../all/etcd-encryption
+  # - ../all/ldap-oauth

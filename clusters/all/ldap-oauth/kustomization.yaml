@@ -1,0 +1,6 @@
+# Optional: sync only after ldap-bind-password Secret and ldap-ca ConfigMap exist
+# in openshift-config. See 01-ldap-authentication/README.md.
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources:
+  - ../../../01-ldap-authentication/oauth-ldap-idp.yaml

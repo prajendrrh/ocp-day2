@@ -1,0 +1,25 @@
+# Apply once after OpenShift GitOps is installed.
+# Uses the built-in "default" Argo CD project so this file can be applied before day2-ops exists.
+# Edit spec.source.repoURL and targetRevision to match your fork and branch.
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: day2-root
+  namespace: openshift-gitops
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+spec:
+  project: default
+  source:
+    repoURL: https://github.com/example/ocp-day2.git
+    targetRevision: main
+    path: gitops/bootstrap
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: openshift-gitops
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=false
