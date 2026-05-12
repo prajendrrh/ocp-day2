@@ -19,7 +19,7 @@ Everything Argo CD applies from this repo is **plain Kubernetes/OpenShift YAML**
 
 ## Prerequisites
 
-- OpenShift with the **Red Hat OpenShift GitOps** operator installed (default instance in `openshift-gitops`).
+- OpenShift with the **Red Hat OpenShift GitOps** operator installed (default instance in `openshift-gitops`). On a **new** cluster, install it declaratively first using [`07-openshift-gitops-operator/README.md`](../07-openshift-gitops-operator/README.md) (or the equivalent Kustomize path `clusters/all/openshift-gitops-operator`).
 - This repository pushed to a Git remote Argo CD can reach (HTTPS or SSH + credentials if private).
 - Cluster-admin (or equivalent) for first-time bootstrap objects.
 
@@ -37,7 +37,7 @@ Tighten `spec.sourceRepos` in `gitops/argocd/day2-appproject.yaml` for productio
 
 ## Bootstrap (in-cluster Argo CD)
 
-1. Install OpenShift GitOps if it is not already present.
+1. If Argo CD is not installed yet, apply the operator manifests from topic **07** (for example `oc apply -k clusters/all/openshift-gitops-operator` from the repo root). The `day2-root` Application cannot install the operator on the same cluster first—there is no Argo CD to run the sync until the operator exists.
 2. If the cluster cannot reach your Git server without credentials, create a repository `Secret` in `openshift-gitops` per [Configuring Argo CD to access the Git repository](https://docs.openshift.com/gitops/latest/gitops/configuring_argo_cd_to_access_the_git_repository.html).
 3. Create the root `Application` resource once from `gitops/argocd/root-application.yaml` (it uses the built-in `default` Argo CD project so you do not need `day2-ops` to exist first). Use the OpenShift console, your CI/CD apply step, or any Kubernetes client—same manifest, no repo-local script.
 

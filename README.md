@@ -3,7 +3,7 @@
 This repository is a structured proof of concept (PoC) for **OpenShift Day 2 operations**.
 
 - **GitOps path (recommended for SSOT):** cluster configuration is **configuration as code** only—Kubernetes/OpenShift manifests and Kustomize under `clusters/` and `gitops/`, reconciled by OpenShift GitOps. There are **no shell scripts** in this repo for delivering Day 2 settings; you change Git and let Argo CD sync.
-- **Topic runbooks (`01-` … `06-`):** optional narrative procedures, sometimes with `oc` examples for learning, troubleshooting, or one-off tasks. They are not required when you manage the cluster through GitOps.
+- **Topic runbooks (`01-` … `07-`):** optional narrative procedures, sometimes with `oc` examples for learning, troubleshooting, or one-off tasks. They are not required when you manage the cluster through GitOps.
 
 ## Environment
 
@@ -21,6 +21,7 @@ Each topic is a numbered folder:
 - `04-log-forwarding-to-siem/`: Forward logs to a local SIEM system
 - `05-etcd-encryption/`: Enable etcd encryption at rest
 - `06-logging-and-monitoring-setup/`: Logging and monitoring setup (OpenShift 4.21 docs)
+- `07-openshift-gitops-operator/`: Install the Red Hat OpenShift GitOps operator (OLM) on a new cluster before Argo CD bootstrap
 - `clusters/`: Kustomize paths consumed by OpenShift GitOps (see `clusters/README.md`)
 - `gitops/`: Argo CD `Application` and `AppProject` manifests (see `gitops/README.md`)
 
