@@ -9,7 +9,7 @@ This repository is a structured proof of concept (PoC) for **OpenShift Day 2 ope
 
 The default bootstrap uses a **single child Application** (**`day2-ntp-and-etcd`**) so Argo CD applies **MachineConfig (NTP) before APIServer (etcd encryption)** using sync waves—**no manual “Sync” clicks** for NTP or etcd once `day2-root` is syncing.
 
-1. **Set your Git remote** in `gitops/argocd/root-application.yaml` and every `gitops/applications/*.yaml` (`repoURL`, `targetRevision`).
+1. **Confirm Git remote** — `repoURL` / `targetRevision` default to **`https://github.com/prajendrrh/ocp-day2.git`** and **`main`** in `gitops/argocd/root-application.yaml` and `gitops/applications/*.yaml`. Change them if you use another fork or branch.
 2. **Unattended install (recommended on a fresh cluster):** from a clone of this repo, with `KUBECONFIG` pointing at the cluster and **cluster-admin**:
 
    ```bash

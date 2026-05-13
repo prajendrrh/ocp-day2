@@ -26,7 +26,7 @@ Everything Argo CD applies from this repo is **plain Kubernetes/OpenShift YAML**
 
 ## Configure the Git remote
 
-Replace every `https://github.com/example/ocp-day2.git` and `targetRevision: main` in:
+The manifests default to `https://github.com/prajendrrh/ocp-day2.git` and `targetRevision: main`. To use a different remote or branch, edit:
 
 - `gitops/argocd/root-application.yaml`
 - `gitops/applications/*.yaml`

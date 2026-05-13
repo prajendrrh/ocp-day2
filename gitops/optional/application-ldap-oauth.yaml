@@ -9,7 +9,7 @@ metadata:
 spec:
   project: day2-ops
   source:
-    repoURL: https://github.com/example/ocp-day2.git
+    repoURL: https://github.com/prajendrrh/ocp-day2.git
     targetRevision: main
     path: clusters/all/ldap-oauth
     kustomize:
