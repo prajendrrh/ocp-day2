@@ -1,11 +1,15 @@
-# Aggregate path for a single Argo CD Application (everything below in one sync).
-# For selective sync, use clusters/all/<component> paths from separate Applications instead.
+# Optional single Argo CD Application path (spec.source.path: clusters/hub).
+# Matches the phased test order: NTP first, then etcd (both after GitOps is running).
+# If you use one Application for this path, prefer manual sync or sync only after NTP
+# is healthy—etcd encryption is high impact.
+# Do not add openshift-gitops-operator here—apply clusters/all/openshift-gitops-operator
+# before Argo CD exists on a new cluster.
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 resources:
-  - ../all/monitoring-placement
   - ../all/ntp-chrony
-  - ../all/log-forwarding
-  # High-impact or secret-dependent — enable deliberately:
-  # - ../all/etcd-encryption
+  - ../all/etcd-encryption
+  # Later, when you expand beyond NTP + etcd:
+  # - ../all/monitoring-placement
+  # - ../all/log-forwarding
   # - ../all/ldap-oauth
