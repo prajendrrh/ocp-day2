@@ -1,14 +1,15 @@
+# One Application: NTP MachineConfig (sync wave 5) then APIServer encryption (wave 20).
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: day2-ntp-chrony
+  name: day2-ntp-and-etcd
   namespace: openshift-gitops
 spec:
   project: day2-ops
   source:
     repoURL: https://github.com/example/ocp-day2.git
     targetRevision: main
-    path: clusters/all/ntp-chrony
+    path: clusters/phased/ntp-then-etcd
     kustomize:
       buildOptions: --load-restrictor LoadRestrictionsNone
   destination:

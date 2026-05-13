@@ -12,13 +12,15 @@ This topic installs the **Red Hat OpenShift GitOps** operator (OLM) so the defau
 
 ### 1. Apply Namespace, OperatorGroup, and Subscription
 
-From the repository root, apply the Kustomize bundle (order is defined in `clusters/all/openshift-gitops-operator/kustomization.yaml`):
+From the repository root, apply the operator bundle. Because Kustomize pulls YAML from `openshift-gitops-operator/` outside `clusters/all/openshift-gitops-operator/`, use:
 
 ```bash
-oc apply -k ./clusters/all/openshift-gitops-operator
+kubectl kustomize --load-restrictor=LoadRestrictionsNone ./clusters/all/openshift-gitops-operator | oc apply -f -
 ```
 
-Alternatively, apply the three manifests in this folder in order: `namespace.yaml`, `operatorgroup.yaml`, `subscription.yaml`.
+Or run the full unattended bootstrap (operator + wait + `day2-root`): [`scripts/bootstrap-fresh-cluster.sh`](../scripts/bootstrap-fresh-cluster.sh).
+
+`oc apply -k ./clusters/all/openshift-gitops-operator` may fail on strict Kustomize clients without the load-restrictor flag.
 
 ### 2. Wait for the operator and default Argo CD
 

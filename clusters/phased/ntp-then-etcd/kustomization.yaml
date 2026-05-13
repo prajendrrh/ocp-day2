@@ -1,0 +1,10 @@
+# Single Argo CD Application: NTP (MachineConfig) syncs before etcd APIServer change.
+# Sync waves are honored within one Application sync.
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources:
+  - ../../../ntp-chrony-configuration/99-worker-chrony.yaml
+  - ../../../etcd-encryption/apiserver-encryption-aesgcm.yaml
+patches:
+  - path: patch-mc-sync-wave.yaml
+  - path: patch-apiserver-sync-wave.yaml

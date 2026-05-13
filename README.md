@@ -2,18 +2,27 @@
 
 This repository is a structured proof of concept (PoC) for **OpenShift Day 2 operations**.
 
-- **GitOps path (recommended for SSOT):** cluster configuration is **configuration as code** only—Kubernetes/OpenShift manifests and Kustomize under `clusters/` and `gitops/`, reconciled by OpenShift GitOps. There are **no shell scripts** in this repo for delivering Day 2 settings; you change Git and let Argo CD sync.
+- **GitOps path (recommended for SSOT):** cluster configuration is **configuration as code**—manifests and Kustomize under `clusters/` and `gitops/`, reconciled by OpenShift GitOps. After the operator is running, **ongoing** Day 2 changes are Git commits only. A small **bootstrap script** (`scripts/bootstrap-fresh-cluster.sh`) is optional glue for a brand-new cluster (install operator, wait, apply root `Application`); it does not replace GitOps for configuration.
 - **Topic runbooks:** optional narrative folders (sometimes with `oc` examples for learning, troubleshooting, or one-off tasks). They are not required when you manage the cluster through GitOps.
 
-## New cluster: phased validation (GitOps first, then one topic at a time)
+## New cluster: phased validation (GitOps first, then NTP + etcd automatically)
 
-The repo defaults to a **small, testable slice**: install GitOps, prove **NTP (chrony)**, then **etcd encryption**, before turning on other Argo CD `Application` objects.
+The default bootstrap uses a **single child Application** (**`day2-ntp-and-etcd`**) so Argo CD applies **MachineConfig (NTP) before APIServer (etcd encryption)** using sync waves—**no manual “Sync” clicks** for NTP or etcd once `day2-root` is syncing.
 
-1. **Install OpenShift GitOps** — apply [`openshift-gitops-operator`](openshift-gitops-operator/README.md) (or `oc apply -k ./clusters/all/openshift-gitops-operator` from the repo root). Argo CD does not exist until the operator finishes installing.
-2. **Bootstrap Argo CD** — register Git access if needed, apply the root `Application`, sync **`day2-root`**. That creates only **NTP** and **etcd encryption** child apps (plus `day2-ops`). See [`gitops/README.md`](gitops/README.md).
-3. **Validate NTP** — confirm **day2-ntp-chrony** is healthy (MachineConfig rolled out, chrony as expected). Fix Git or cluster issues before continuing.
-4. **Validate etcd encryption** — in Argo CD, **Sync** **day2-etcd-encryption** manually when ready (maintenance window, backups). Confirm encryption completes per [`etcd-encryption/README.md`](etcd-encryption/README.md).
-5. **Add more topics** — when this path is solid, uncomment or add one `Application` line at a time in [`gitops/bootstrap/kustomization.yaml`](gitops/bootstrap/kustomization.yaml), commit, sync, and validate before adding the next.
+1. **Set your Git remote** in `gitops/argocd/root-application.yaml` and every `gitops/applications/*.yaml` (`repoURL`, `targetRevision`).
+2. **Unattended install (recommended on a fresh cluster):** from a clone of this repo, with `KUBECONFIG` pointing at the cluster and **cluster-admin**:
+
+   ```bash
+   ./scripts/bootstrap-fresh-cluster.sh
+   ```
+
+   That installs the OpenShift GitOps operator, waits until Argo CD is ready, applies **`day2-root`**, and Argo CD then **automatically** syncs NTP and etcd in order. If the repo is private, create a Git credential `Secret` in `openshift-gitops` before or after the script (see [`gitops/README.md`](gitops/README.md)).
+
+3. **Validate** — watch `oc get applications.argoproj.io -n openshift-gitops`, MachineConfig pools, and API server encryption status per [`etcd-encryption/README.md`](etcd-encryption/README.md) and [`ntp-chrony-configuration/README.md`](ntp-chrony-configuration/README.md).
+
+4. **Add more topics** — when this path is solid, uncomment or add one `Application` line at a time in [`gitops/bootstrap/kustomization.yaml`](gitops/bootstrap/kustomization.yaml), commit, let `day2-root` reconcile, and validate before adding the next.
+
+**Manual alternative:** install the operator and root `Application` step-by-step as in [`openshift-gitops-operator/README.md`](openshift-gitops-operator/README.md) and [`gitops/README.md`](gitops/README.md). For `kubectl` / `oc apply -k` against `clusters/all/*` paths, you may need `--load-restrictor=LoadRestrictionsNone` (see script); Argo CD is configured in the `Application` manifests to use the same so builds from Git succeed.
 
 ## Environment
 
