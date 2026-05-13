@@ -10,8 +10,6 @@ spec:
     repoURL: https://github.com/prajendrrh/ocp-day2.git
     targetRevision: main
     path: clusters/phased/ntp-then-etcd
-    kustomize:
-      buildOptions: --load-restrictor LoadRestrictionsNone
   destination:
     server: https://kubernetes.default.svc
     namespace: openshift-gitops

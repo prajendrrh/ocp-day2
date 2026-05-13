@@ -37,7 +37,7 @@ Tighten `spec.sourceRepos` in `gitops/bootstrap/day2-appproject.yaml` for produc
 
 1. If Argo CD is not installed yet, apply the operator manifests from [`openshift-gitops-operator`](../openshift-gitops-operator/README.md). For a **fully unattended** first pass, run [`scripts/bootstrap-fresh-cluster.sh`](../scripts/bootstrap-fresh-cluster.sh) from a repo clone (requires `oc`, `kubectl`, and `KUBECONFIG`). The `day2-root` Application cannot install the operator on the same cluster first—there is no Argo CD to run that sync until the operator exists.
 
-   Child `Application` sources under `clusters/*` still use `spec.source.kustomize.buildOptions: --load-restrictor LoadRestrictionsNone` because those Kustomizations reference topic YAML outside `clusters/`. The **`day2-root`** build of `gitops/bootstrap` does not need that flag (all YAML lives under `gitops/bootstrap/`).
+   Child `Application` sources that use **`clusters/all/<component>/`** still set `spec.source.kustomize.buildOptions: --load-restrictor LoadRestrictionsNone` because those Kustomizations reference topic YAML outside `clusters/`. The combined path **`clusters/phased/ntp-then-etcd`** keeps all manifests under that directory, so it does **not** need `buildOptions`. The **`day2-root`** build of `gitops/bootstrap` also does not (all YAML is under `gitops/bootstrap/`).
 
 2. If the cluster cannot reach your Git server without credentials, create a repository `Secret` in `openshift-gitops` per [Configuring Argo CD to access the Git repository](https://docs.openshift.com/gitops/latest/gitops/configuring_argo_cd_to_access_the_git_repository.html).
 
@@ -47,7 +47,7 @@ Tighten `spec.sourceRepos` in `gitops/bootstrap/day2-appproject.yaml` for produc
 
 ### Phased validation (default bootstrap)
 
-`gitops/bootstrap/kustomization.yaml` ships a **single** child Application, **`day2-ntp-and-etcd`**, which points at [`clusters/phased/ntp-then-etcd`](../clusters/phased/ntp-then-etcd) so one automated sync orders NTP before etcd. Both use **automated** `syncPolicy` on that Application.
+`gitops/bootstrap/kustomization.yaml` ships a **single** child Application, **`day2-ntp-and-etcd`**, which points at [`clusters/phased/ntp-then-etcd`](../clusters/phased/ntp-then-etcd). That folder contains **copies** of the NTP MachineConfig and etcd `APIServer` manifests (with sync-wave annotations) so Kustomize stays within the directory—**edit the topic YAML and the copies together** when you change chrony or encryption settings.
 
 | Child `Application` | Sync | Notes |
 |---------------------|------|--------|
@@ -68,7 +68,7 @@ Keep secrets out of plain Git when possible; still avoid shell glue by using ope
 
 ## One Application instead of app-of-apps
 
-Create an Argo CD `Application` with `spec.source.path: clusters/hub` (same `repoURL` / `targetRevision`, and `spec.source.kustomize.buildOptions: --load-restrictor LoadRestrictionsNone` like the other Applications). `clusters/hub` reuses `clusters/phased/ntp-then-etcd` for the same ordering.
+Create an Argo CD `Application` with `spec.source.path: clusters/hub` (same `repoURL` / `targetRevision`). `clusters/hub` reuses `clusters/phased/ntp-then-etcd` (self-contained Kustomize). If you add `clusters/all/*` entries to `clusters/hub/kustomization.yaml`, set `buildOptions` on that Application as for other `clusters/all` paths.
 
 ## Multiple clusters
 
