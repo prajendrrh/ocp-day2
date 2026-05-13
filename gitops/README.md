@@ -12,11 +12,9 @@ Everything Argo CD applies from this repo is **plain Kubernetes/OpenShift YAML**
 |------|------|
 | `clusters/all/<component>/` | Kustomize entrypoints that reference topic YAML under the named topic folders (no duplicate copies). |
 | `clusters/hub/` | Optional **single Application** stack; defaults to **NTP + etcd** (same order as phased testing). |
-| `gitops/argocd/` | `AppProject` (`day2-ops`) and the **root** `Application` (app-of-apps). |
+| `gitops/argocd/` | Root `Application` (`day2-root`) only. |
 | `clusters/phased/` | Ordered bundles (for example **NTP then etcd** in one sync) using Argo CD sync waves. |
-| `gitops/bootstrap/` | Kustomize that renders the child `Application` objects managed by `day2-root` (default: **`day2-ntp-and-etcd`** only). |
-| `gitops/applications/` | Child `Application` manifests (one logical Day 2 area each). |
-| `gitops/optional/` | Opt-in apps (for example LDAP OAuth) you add to bootstrap when ready. |
+| `gitops/bootstrap/` | `kustomization.yaml` plus **all** child `Application` and `AppProject` YAML used by `day2-root` (same directory so Kustomize works under Argo CD load rules). |
 
 ## Prerequisites
 
@@ -29,18 +27,17 @@ Everything Argo CD applies from this repo is **plain Kubernetes/OpenShift YAML**
 The manifests default to `https://github.com/prajendrrh/ocp-day2.git` and `targetRevision: main`. To use a different remote or branch, edit:
 
 - `gitops/argocd/root-application.yaml`
-- `gitops/applications/*.yaml`
-- `gitops/optional/*.yaml` (if used)
+- Each `gitops/bootstrap/day2-*.yaml` and `gitops/bootstrap/application-ldap-oauth.yaml` you list under `gitops/bootstrap/kustomization.yaml` `resources:`
 
 Use your fork URL and branch or tag.
 
-Tighten `spec.sourceRepos` in `gitops/argocd/day2-appproject.yaml` for production instead of `*`.
+Tighten `spec.sourceRepos` in `gitops/bootstrap/day2-appproject.yaml` for production instead of `*`.
 
 ## Bootstrap (in-cluster Argo CD)
 
 1. If Argo CD is not installed yet, apply the operator manifests from [`openshift-gitops-operator`](../openshift-gitops-operator/README.md). For a **fully unattended** first pass, run [`scripts/bootstrap-fresh-cluster.sh`](../scripts/bootstrap-fresh-cluster.sh) from a repo clone (requires `oc`, `kubectl`, and `KUBECONFIG`). The `day2-root` Application cannot install the operator on the same cluster first—there is no Argo CD to run that sync until the operator exists.
 
-   Operator install uses `kubectl kustomize --load-restrictor=LoadRestrictionsNone` because Kustomize references live under topic folders outside `clusters/all/openshift-gitops-operator/`; the same flag is set on Argo `Application` sources so in-cluster builds match.
+   Child `Application` sources under `clusters/*` still use `spec.source.kustomize.buildOptions: --load-restrictor LoadRestrictionsNone` because those Kustomizations reference topic YAML outside `clusters/`. The **`day2-root`** build of `gitops/bootstrap` does not need that flag (all YAML lives under `gitops/bootstrap/`).
 
 2. If the cluster cannot reach your Git server without credentials, create a repository `Secret` in `openshift-gitops` per [Configuring Argo CD to access the Git repository](https://docs.openshift.com/gitops/latest/gitops/configuring_argo_cd_to_access_the_git_repository.html).
 
@@ -60,13 +57,13 @@ To use **separate** Applications instead (for example manual etcd), replace `day
 
 ### Other Application manifests (not in bootstrap by default)
 
-Ready-to-use files live under `gitops/applications/`; copy the commented pattern from `gitops/bootstrap/kustomization.yaml` to enable them (add one line at a time, validate, repeat). LDAP OAuth is under `gitops/optional/application-ldap-oauth.yaml`.
+Ready-to-use files live in **`gitops/bootstrap/`** next to `kustomization.yaml`; copy the commented pattern from `gitops/bootstrap/kustomization.yaml` to enable them (add one line at a time, validate, repeat). LDAP OAuth is `gitops/bootstrap/application-ldap-oauth.yaml`.
 
 ## Secrets and merge-sensitive resources
 
 Keep secrets out of plain Git when possible; still avoid shell glue by using operators or controllers that materialize `Secret` objects from encrypted or external stores (Sealed Secrets, External Secrets Operator, vault agents, and so on)—those integrations are themselves configured with more YAML in Git.
 
-- **LDAP** (`clusters/all/ldap-oauth`): requires `Secret` / `ConfigMap` in `openshift-config` before sync; applying a full `OAuth` manifest can overwrite other identity providers if your live object differs—review [Configuring an LDAP identity provider](https://docs.redhat.com/en/documentation/openshift_container_platform/latest/html/authentication_and_authorization/configuring-ldap-identity-provider) and prefer patches or a dedicated pipeline if you already have multiple IdPs. Enable via `gitops/optional/application-ldap-oauth.yaml` only when ready.
+- **LDAP** (`clusters/all/ldap-oauth`): requires `Secret` / `ConfigMap` in `openshift-config` before sync; applying a full `OAuth` manifest can overwrite other identity providers if your live object differs—review [Configuring an LDAP identity provider](https://docs.redhat.com/en/documentation/openshift_container_platform/latest/html/authentication_and_authorization/configuring-ldap-identity-provider) and prefer patches or a dedicated pipeline if you already have multiple IdPs. Enable via `gitops/bootstrap/application-ldap-oauth.yaml` only when ready.
 - **SIEM forwarding**: provide TLS CA material and adjust URLs as described in `log-forwarding-to-siem/README.md` before syncing **day2-log-forwarding** (again as declarative resources, not one-off shell).
 
 ## One Application instead of app-of-apps

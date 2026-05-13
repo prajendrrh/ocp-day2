@@ -1,0 +1,18 @@
+# Optional split app: etcd encryption only (no sync-wave ordering vs NTP).
+# Prefer day2-ntp-and-etcd when applying NTP + etcd from one Application.
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: day2-etcd-encryption
+  namespace: openshift-gitops
+spec:
+  project: day2-ops
+  source:
+    repoURL: https://github.com/prajendrrh/ocp-day2.git
+    targetRevision: main
+    path: clusters/all/etcd-encryption
+    kustomize:
+      buildOptions: --load-restrictor LoadRestrictionsNone
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: openshift-gitops

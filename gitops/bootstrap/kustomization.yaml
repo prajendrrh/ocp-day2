@@ -1,16 +1,19 @@
 # Renders child Argo CD Applications (app-of-apps). Synced by day2-root Application.
 #
+# All resource paths are under this directory so `kustomize build` succeeds under
+# Argo CD's default load restrictions (no ../ references).
+#
 # Default: one combined app (NTP then etcd via sync waves) so a fresh cluster can
 # converge without manual Sync clicks. Add more resources when you validate each topic.
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 resources:
-  - ../argocd/day2-appproject.yaml
-  - ../applications/day2-ntp-and-etcd.yaml
-  # Optional split apps (same paths as combined; use instead of day2-ntp-and-etcd if you prefer):
-  # - ../applications/day2-ntp-chrony.yaml
-  # - ../applications/day2-etcd-encryption.yaml
+  - day2-appproject.yaml
+  - day2-ntp-and-etcd.yaml
+  # Optional split apps (use instead of day2-ntp-and-etcd if you prefer):
+  # - day2-ntp-chrony.yaml
+  # - day2-etcd-encryption.yaml
   # After NTP + etcd behave as expected, add one line at a time:
-  # - ../applications/day2-monitoring-placement.yaml
-  # - ../applications/day2-log-forwarding.yaml
-  # LDAP: ../optional/application-ldap-oauth.yaml
+  # - day2-monitoring-placement.yaml
+  # - day2-log-forwarding.yaml
+  # LDAP: application-ldap-oauth.yaml

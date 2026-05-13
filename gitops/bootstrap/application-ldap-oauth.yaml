@@ -1,0 +1,19 @@
+# Optional: add this file to gitops/bootstrap/kustomization.yaml resources when
+# openshift-config has ldap-bind-password and (if needed) ldap-ca, and you accept
+# Git managing the OAuth identityProviders list for this provider.
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: day2-ldap-oauth
+  namespace: openshift-gitops
+spec:
+  project: day2-ops
+  source:
+    repoURL: https://github.com/prajendrrh/ocp-day2.git
+    targetRevision: main
+    path: clusters/all/ldap-oauth
+    kustomize:
+      buildOptions: --load-restrictor LoadRestrictionsNone
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: openshift-gitops
