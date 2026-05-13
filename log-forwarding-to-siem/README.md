@@ -1,4 +1,4 @@
-# 04 — Forward logs to a local SIEM system
+# Forward logs to a local SIEM system
 
 This topic forwards OpenShift logs to an external SIEM. The most common pattern is:
 
@@ -9,7 +9,7 @@ This topic forwards OpenShift logs to an external SIEM. The most common pattern 
 
 - OpenShift 4.21 cluster access as `cluster-admin`
 - SIEM details (protocol + host/port + TLS requirements) — **not needed for this PoC right now**
-- OpenShift Logging components installed (see `../06-logging-and-monitoring-setup/` for baseline setup)
+- OpenShift Logging components installed (see `../logging-and-monitoring-setup/` for baseline setup)
 
 ## Procedure
 

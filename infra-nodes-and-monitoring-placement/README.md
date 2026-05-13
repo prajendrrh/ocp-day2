@@ -1,4 +1,4 @@
-# 02 — Label infra nodes and move monitoring workloads
+# Label infra nodes and move monitoring workloads
 
 This topic shows how to:
 

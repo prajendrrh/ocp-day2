@@ -1,4 +1,4 @@
-# 01 — Topic template (replace with your Day 2 topic)
+# Topic template (replace with your Day 2 topic)
 
 This folder is a **template** for a Day 2 operations topic. Copy/rename it to match a real topic, then replace the contents with the actual procedure and (optional) YAML resources.
 

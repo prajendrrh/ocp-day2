@@ -1,10 +1,10 @@
-# 06 — Logging and Monitoring setup (OpenShift 4.21)
+# Logging and monitoring setup (OpenShift 4.21)
 
 This topic is a **Day 2 baseline** for observability:
 
 - Platform monitoring (Prometheus/Alertmanager) configuration touchpoints
 - Cluster logging operator installation and core configuration concepts
-- Log forwarding to external systems (ties into `../04-log-forwarding-to-siem/`)
+- Log forwarding to external systems (ties into `../log-forwarding-to-siem/`)
 
 This repo intentionally keeps manifests **minimal** and focuses on the operational steps and where configuration lives.
 
@@ -31,7 +31,7 @@ Core platform monitoring is configured via:
 
 - `openshift-monitoring/cluster-monitoring-config` (ConfigMap)
 
-Example (infra placement) is in `../02-infra-nodes-and-monitoring-placement/cluster-monitoring-config.yaml`.
+Example (infra placement) is in `../infra-nodes-and-monitoring-placement/cluster-monitoring-config.yaml`.
 
 ### 3. Install logging components (operator-managed)
 
@@ -48,7 +48,7 @@ oc -n openshift-operators get subscriptions | grep -i logging || true
 
 Once logging/collector is available, configure `ClusterLogForwarder` pipelines to send logs to:
 
-- SIEM / syslog (see `../04-log-forwarding-to-siem/clusterlogforwarder-siem-syslog.yaml`)
+- SIEM / syslog (see `../log-forwarding-to-siem/clusterlogforwarder-siem-syslog.yaml`)
 
 ### 5. Verify
 

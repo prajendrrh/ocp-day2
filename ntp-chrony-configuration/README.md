@@ -1,4 +1,4 @@
-# 03 — Configure NTP servers (chrony) via MachineConfig
+# Configure NTP servers (chrony) via MachineConfig
 
 This topic configures node time synchronization by **overriding `/etc/chrony.conf`** on OpenShift nodes using a `MachineConfig`.
 

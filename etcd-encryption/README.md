@@ -1,4 +1,4 @@
-# 05 — Enable etcd encryption at rest
+# Enable etcd encryption at rest
 
 This topic enables **etcd encryption** for sensitive resources (like Secrets) stored in etcd.
 

@@ -1,4 +1,4 @@
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 resources:
-  - ../../../02-infra-nodes-and-monitoring-placement/cluster-monitoring-config.yaml
+  - ../../../infra-nodes-and-monitoring-placement/cluster-monitoring-config.yaml

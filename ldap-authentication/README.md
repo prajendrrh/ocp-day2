@@ -1,4 +1,4 @@
-# 01 — Add OpenShift authentication via LDAP
+# Add OpenShift authentication via LDAP
 
 This topic configures an **LDAP identity provider** for OpenShift authentication (OAuth), so users can log in with their enterprise directory credentials.
 

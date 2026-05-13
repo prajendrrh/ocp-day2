@@ -1,6 +1,6 @@
-# 07 — Install Red Hat OpenShift GitOps operator
+# Install Red Hat OpenShift GitOps operator
 
-This topic installs the **Red Hat OpenShift GitOps** operator (OLM) so the default Argo CD instance is created in `openshift-gitops`. Do this **before** you rely on in-cluster Argo CD to sync this repository’s `gitops/` Applications.
+This topic installs the **Red Hat OpenShift GitOps** operator (OLM) so the default Argo CD instance is created in `openshift-gitops`. On a **new** cluster, do this **first**—before you rely on in-cluster Argo CD to sync this repository’s `gitops/` Applications.
 
 ## Prerequisites
 
@@ -36,7 +36,7 @@ Follow [`gitops/README.md`](../gitops/README.md): register your Git repository i
 
 ## Why this is not in the app-of-apps by default
 
-On a **brand-new** cluster, Argo CD does not exist until this operator is installed. The root `Application` in `gitops/argocd/` cannot sync the operator subscription onto the same cluster before that. Install the operator using this topic (or the console equivalent) first; after that, Argo CD can own the rest of Day 2 from Git.
+On a **brand-new** cluster, Argo CD does not exist until this operator is installed. The root `Application` in `gitops/argocd/` cannot sync the operator subscription onto the same cluster before that. Apply this topic’s manifests (or the console equivalent) first; after that, Argo CD can own the rest of Day 2 from Git.
 
 ## Expected output
 
