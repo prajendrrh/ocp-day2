@@ -27,7 +27,7 @@ Everything Argo CD applies from this repo is **plain Kubernetes/OpenShift YAML**
 The manifests default to `https://github.com/prajendrrh/ocp-day2.git` and `targetRevision: main`. To use a different remote or branch, edit:
 
 - `gitops/argocd/root-application.yaml`
-- Each `gitops/bootstrap/day2-*.yaml` and `gitops/bootstrap/application-ldap-oauth.yaml` you list under `gitops/bootstrap/kustomization.yaml` `resources:`
+- Each `gitops/bootstrap/day2-*.yaml` you list under `gitops/bootstrap/kustomization.yaml` `resources:`
 
 Use your fork URL and branch or tag.
 
@@ -55,20 +55,13 @@ Tighten `spec.sourceRepos` in `gitops/bootstrap/day2-appproject.yaml` for produc
 
 To use **separate** Applications instead (for example manual etcd), replace `day2-ntp-and-etcd.yaml` in `gitops/bootstrap/kustomization.yaml` with the commented `day2-ntp-chrony.yaml` / `day2-etcd-encryption.yaml` lines and tune `syncPolicy` on etcd as needed.
 
-### Other Application manifests (not in bootstrap by default)
-
-Ready-to-use files live in **`gitops/bootstrap/`** next to `kustomization.yaml`; copy the commented pattern from `gitops/bootstrap/kustomization.yaml` to enable them (add one line at a time, validate, repeat). LDAP OAuth is `gitops/bootstrap/application-ldap-oauth.yaml`.
-
 ## Secrets and merge-sensitive resources
 
-Keep secrets out of plain Git when possible; still avoid shell glue by using operators or controllers that materialize `Secret` objects from encrypted or external stores (Sealed Secrets, External Secrets Operator, vault agents, and so on)—those integrations are themselves configured with more YAML in Git.
-
-- **LDAP** (`clusters/all/ldap-oauth`): requires `Secret` / `ConfigMap` in `openshift-config` before sync; applying a full `OAuth` manifest can overwrite other identity providers if your live object differs—review [Configuring an LDAP identity provider](https://docs.redhat.com/en/documentation/openshift_container_platform/latest/html/authentication_and_authorization/configuring-ldap-identity-provider) and prefer patches or a dedicated pipeline if you already have multiple IdPs. Enable via `gitops/bootstrap/application-ldap-oauth.yaml` only when ready.
-- **SIEM forwarding**: provide TLS CA material and adjust URLs as described in `log-forwarding-to-siem/README.md` before syncing **day2-log-forwarding** (again as declarative resources, not one-off shell).
+Keep secrets out of plain Git when possible; use operators or controllers that materialize `Secret` objects from encrypted or external stores (Sealed Secrets, External Secrets Operator, vault agents, and so on)—those integrations are themselves configured with more YAML in Git.
 
 ## One Application instead of app-of-apps
 
-Create an Argo CD `Application` with `spec.source.path: clusters/hub` (same `repoURL` / `targetRevision`). `clusters/hub` reuses `clusters/phased/ntp-then-etcd` (self-contained Kustomize). If you add `clusters/all/*` entries to `clusters/hub/kustomization.yaml`, set `buildOptions` on that Application as for other `clusters/all` paths.
+Create an Argo CD `Application` with `spec.source.path: clusters/hub` (same `repoURL` / `targetRevision`). `clusters/hub` reuses `clusters/phased/ntp-then-etcd` (self-contained Kustomize).
 
 ## Multiple clusters
 

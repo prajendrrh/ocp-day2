@@ -9,7 +9,7 @@ This repository is a structured proof of concept (PoC) for **OpenShift Day 2 ope
 
 The default bootstrap uses a **single child Application** (**`day2-ntp-and-etcd`**) so Argo CD applies **MachineConfig (NTP) before APIServer (etcd encryption)** using sync waves—**no manual “Sync” clicks** for NTP or etcd once `day2-root` is syncing.
 
-1. **Confirm Git remote** — `repoURL` / `targetRevision` default to **`https://github.com/prajendrrh/ocp-day2.git`** and **`main`** in `gitops/argocd/root-application.yaml` and in each `gitops/bootstrap/day2-*.yaml` / `application-ldap-oauth.yaml` you enable. Change them if you use another fork or branch.
+1. **Confirm Git remote** — `repoURL` / `targetRevision` default to **`https://github.com/prajendrrh/ocp-day2.git`** and **`main`** in `gitops/argocd/root-application.yaml` and in each `gitops/bootstrap/day2-*.yaml` you enable. Change them if you use another fork or branch.
 2. **Unattended install (recommended on a fresh cluster):** from a clone of this repo, with `KUBECONFIG` pointing at the cluster and **cluster-admin**:
 
    ```bash
@@ -37,10 +37,6 @@ Topic folders use **descriptive names** (no numeric prefixes). For a new cluster
 | Folder | Summary |
 |--------|---------|
 | [`openshift-gitops-operator/`](openshift-gitops-operator/README.md) | Install the Red Hat OpenShift GitOps operator (OLM); do this **first** on a new cluster |
-| [`infra-nodes-and-monitoring-placement/`](infra-nodes-and-monitoring-placement/README.md) | Label infra nodes; move platform monitoring onto infra |
-| [`ldap-authentication/`](ldap-authentication/README.md) | LDAP identity provider (OAuth) |
-| [`logging-and-monitoring-setup/`](logging-and-monitoring-setup/README.md) | Logging and monitoring setup (OpenShift 4.21 docs) |
-| [`log-forwarding-to-siem/`](log-forwarding-to-siem/README.md) | Forward logs to a SIEM (syslog) |
 | [`ntp-chrony-configuration/`](ntp-chrony-configuration/README.md) | NTP (chrony) via MachineConfig |
 | [`etcd-encryption/`](etcd-encryption/README.md) | Etcd encryption at rest |
 | [`topic-template/`](topic-template/README.md) | Copy as a starting point for new topics |

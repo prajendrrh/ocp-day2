@@ -13,7 +13,3 @@ resources:
   # Optional split apps (use instead of day2-ntp-and-etcd if you prefer):
   # - day2-ntp-chrony.yaml
   # - day2-etcd-encryption.yaml
-  # After NTP + etcd behave as expected, add one line at a time:
-  # - day2-monitoring-placement.yaml
-  # - day2-log-forwarding.yaml
-  # LDAP: application-ldap-oauth.yaml
