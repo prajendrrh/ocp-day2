@@ -33,7 +33,7 @@ Tighten `spec.sourceRepos` in `gitops/bootstrap/day2-appproject.yaml` for produc
 
 ## Bootstrap (in-cluster Argo CD)
 
-1. If Argo CD is not installed yet, apply the operator from [`clusters/phased/openshift-gitops-operator`](../clusters/phased/openshift-gitops-operator). For a **fully unattended** first pass, run [`scripts/bootstrap-fresh-cluster.sh`](../scripts/bootstrap-fresh-cluster.sh) from a repo clone (requires `oc` and `KUBECONFIG`). The `day2-root` Application cannot install the operator first—there is no Argo CD until the operator exists.
+1. If Argo CD is not installed yet, apply the operator from [`clusters/phased/openshift-gitops-operator`](../clusters/phased/openshift-gitops-operator). For a **fully unattended** first pass, run [`scripts/bootstrap-fresh-cluster.sh`](../scripts/bootstrap-fresh-cluster.sh) from a repo clone (requires `oc` and `KUBECONFIG`). The script also applies [`clusters/phased/argocd-day2-rbac`](../clusters/phased/argocd-day2-rbac) so the application controller can patch cluster-scoped operator configs (image registry, ingress, APIServer, etc.). The `day2-root` Application cannot install the operator first—there is no Argo CD until the operator exists.
 
 2. If the cluster cannot reach your Git server without credentials, create a repository `Secret` in `openshift-gitops` per [Configuring Argo CD to access the Git repository](https://docs.openshift.com/gitops/latest/gitops/configuring_argo_cd_to_access_the_git_repository.html).
 
@@ -47,6 +47,7 @@ Tighten `spec.sourceRepos` in `gitops/bootstrap/day2-appproject.yaml` for produc
 
 | App wave | Application | Timing inside app |
 |----------|-------------|-------------------|
+| -1 | `day2-argocd-rbac` | Argo CD controller RBAC (cluster-scoped Day 2 APIs) |
 | 5 | `day2-ntp-and-etcd` | NTP → **20 min** → etcd |
 | 30 | `day2-infra-nodes` | MachineSets → **20 min** |
 | 40 | `day2-ingress-on-infra` | Ingress → **10 min** |

@@ -8,7 +8,8 @@ Delay hook Jobs run in `openshift-gitops` and use `registry.redhat.io/ubi9/ubi-m
 
 | Path | How it is applied |
 |------|-------------------|
-| `openshift-gitops-operator/` | **Before** Argo CD: `oc apply -k` or [`scripts/bootstrap-fresh-cluster.sh`](../../scripts/bootstrap-fresh-cluster.sh). Not in app-of-apps. |
+| `argocd-day2-rbac/` | Bootstrap script + Argo CD `day2-argocd-rbac` (wave **-1**, before other apps) |
+| `openshift-gitops-operator/` | **Before** Argo CD: `oc apply -k` or bootstrap script. Not in app-of-apps. |
 | `ntp-then-etcd/` | Argo CD `day2-ntp-and-etcd` |
 | `infra-nodes/` | Argo CD `day2-infra-nodes` |
 | `ingress-on-infra/` | Argo CD `day2-ingress-on-infra` |
@@ -21,6 +22,7 @@ Keep phased copies in sync with topic folders at the repo root when you edit man
 
 | App sync wave | Application | What runs |
 |---------------|-------------|-----------|
+| -1 | `day2-argocd-rbac` | RBAC for application controller (registry, ingress, etc.) |
 | 5 | `day2-ntp-and-etcd` | NTP → **20 min** → etcd encryption |
 | 30 | `day2-infra-nodes` | Infra MachineSets → **20 min** |
 | 40 | `day2-ingress-on-infra` | Ingress on infra → **10 min** |
