@@ -58,10 +58,6 @@ Infra MachineSets target cluster **`gitops-tfhd4`** (`eu-west-1a` / `eu-west-1b`
 
 To disable part of the rollout, remove the corresponding line from `gitops/bootstrap/kustomization.yaml` and commit.
 
-### Sequential rollout (experimental)
-
-For **true step-by-step** automation in one sync (readiness hooks, etcd last), see [`clusters/phased/day2-rollout/README.md`](../clusters/phased/day2-rollout/README.md). Enable `day2-rollout-sequential` in bootstrap **instead of** the multi-app workload lines — never both on one cluster.
-
 ## Secrets and merge-sensitive resources
 
 Keep secrets out of plain Git when possible; use operators or controllers that materialize `Secret` objects from encrypted or external stores (Sealed Secrets, External Secrets Operator, vault agents, and so on)—those integrations are themselves configured with more YAML in Git.

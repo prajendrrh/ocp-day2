@@ -12,6 +12,3 @@ resources:
   - day2-ingress-on-infra.yaml
   - day2-registry-on-infra.yaml
   - day2-monitoring-on-infra.yaml
-  # Experimental sequential rollout (one Application, readiness hooks). Enable ONE mode only:
-  # - day2-rollout-sequential.yaml
-  # When enabling sequential mode, comment out day2-argocd-rbac and all day2-* workload apps above.

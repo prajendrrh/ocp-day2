@@ -13,7 +13,6 @@ Each subdirectory is a **self-contained** Kustomize root (manifests stay inside 
 | `ingress-on-infra/` | `day2-ingress-on-infra` | Default ingress on infra → delay |
 | `registry-on-infra/` | `day2-registry-on-infra` | Image registry on infra → delay |
 | `monitoring-on-infra/` | `day2-monitoring-on-infra` | Cluster monitoring on infra |
-| `day2-rollout/` | `day2-rollout-sequential` (experimental; **one** mode per cluster) | Single-app sequential rollout + readiness hooks — [`phased/day2-rollout/README.md`](phased/day2-rollout/README.md) |
 
 Topic folders at the repository root (`ntp-chrony-configuration/`, `infra-nodes-configuration/`, etc.) are **runbooks** and authoring references. When you change YAML there, update the matching copy under `clusters/phased/<bundle>/` and commit both.
 
