@@ -1,6 +1,0 @@
-apiVersion: machineconfiguration.openshift.io/v1
-kind: MachineConfig
-metadata:
-  name: 99-worker-chrony
-  annotations:
-    argocd.argoproj.io/sync-wave: "5"
