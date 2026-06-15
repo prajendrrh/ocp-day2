@@ -1,0 +1,10 @@
+# Copy of etcd-encryption/apiserver-encryption-aesgcm.yaml with Argo sync wave (keep in sync when editing the topic).
+apiVersion: config.openshift.io/v1
+kind: APIServer
+metadata:
+  name: cluster
+  annotations:
+    argocd.argoproj.io/sync-wave: "20"
+spec:
+  encryption:
+    type: aesgcm
