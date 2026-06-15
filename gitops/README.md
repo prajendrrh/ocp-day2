@@ -66,7 +66,7 @@ Enable **one** infra `Application` at a time in `gitops/bootstrap/kustomization.
 | `day2-registry-on-infra` | `clusters/phased/registry-on-infra` | [`registry-on-infra`](../registry-on-infra/README.md) |
 | `day2-monitoring-on-infra` | `clusters/phased/monitoring-on-infra` | [`monitoring-on-infra`](../monitoring-on-infra/README.md) |
 
-Customize `REPLACE_*` in `clusters/phased/infra-nodes/` MachineSet YAML before syncing `day2-infra-nodes`. Keep copies in sync with the topic folder under `infra-nodes-configuration/`.
+Customize `clusters/phased/infra-nodes/` only when your cluster differs from **`gitops-tfhd4`** / **eu-west-1**. Keep copies in sync with `infra-nodes-configuration/`.
 
 ## Secrets and merge-sensitive resources
 

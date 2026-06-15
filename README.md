@@ -33,7 +33,7 @@ After GitOps, NTP, and etcd are validated, add infrastructure placement **in thi
 | 3 | [`registry-on-infra/`](registry-on-infra/README.md) — image registry | `day2-registry-on-infra` |
 | 4 | [`monitoring-on-infra/`](monitoring-on-infra/README.md) — cluster monitoring | `day2-monitoring-on-infra` |
 
-Customize **`REPLACE_*`** placeholders in the infra MachineSet manifests (topic folder and `clusters/phased/infra-nodes/`) before the first sync. Infra Applications use **manual** sync by default—sync and validate each app before uncommenting the next in `gitops/bootstrap/kustomization.yaml`.
+Infra MachineSets are preconfigured for cluster **`gitops-tfhd4`** in **eu-west-1a** / **eu-west-1b**; edit manifests if your cluster differs. Infra Applications use **manual** sync by default—sync and validate each app before uncommenting the next in `gitops/bootstrap/kustomization.yaml`.
 
 **Manual alternative:** install the operator and root `Application` step-by-step as in [`openshift-gitops-operator/README.md`](openshift-gitops-operator/README.md) and [`gitops/README.md`](gitops/README.md). For `kubectl` / `oc apply -k` against `clusters/all/*` paths, you may need `--load-restrictor=LoadRestrictionsNone` (see script); Argo CD is configured in the `Application` manifests to use the same so builds from Git succeed.
 

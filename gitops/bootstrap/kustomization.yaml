@@ -14,7 +14,7 @@ resources:
   # Optional split apps (use instead of day2-ntp-and-etcd if you prefer):
   # - day2-ntp-chrony.yaml
   # - day2-etcd-encryption.yaml
-  # Infra rollout (one Application at a time; customize clusters/phased/infra-nodes REPLACE_* first):
+  # Infra rollout (one Application at a time; validate each step before enabling the next):
   # - day2-infra-nodes.yaml
   # - day2-ingress-on-infra.yaml
   # - day2-registry-on-infra.yaml

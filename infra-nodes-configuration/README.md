@@ -1,6 +1,6 @@
 # Configure infrastructure nodes
 
-Create **at least two** infrastructure nodes (recommended across two availability zones) using infrastructure `MachineSet`s with the **infra** node label and taint from the OpenShift 4.22 docs. **Complete and validate this topic before** moving ingress, registry, or monitoring.
+Create **at least two** infrastructure nodes across **eu-west-1a** and **eu-west-1b** using the `MachineSet` manifests in this folder (cluster **`gitops-tfhd4`**). **Complete and validate this topic before** moving ingress, registry, or monitoring.
 
 This PoC does **not** create a dedicated infra `MachineConfigPool`; infra nodes use the default worker machine config pool unless you add one separately.
 
@@ -9,11 +9,11 @@ This PoC does **not** create a dedicated infra `MachineConfigPool`; infra nodes 
 - OpenShift **4.22** (or compatible) with **Machine API** operational (`oc get infrastructure cluster -o jsonpath='{.status.platform}'`)
 - Cluster-admin access
 - For AWS: installer-provisioned infrastructure (IPI) or validated UPI with Machine API
-- Plan for **≥ 2 infra nodes** (this repo ships two AWS `MachineSet` templates, one per zone)
+- Plan for **≥ 2 infra nodes** — `machineset-infra-aws-zone-a.yaml` and `machineset-infra-aws-zone-b.yaml` (1 replica each in `eu-west-1a` / `eu-west-1b`)
 
 ## Procedure
 
-### 1. Gather cluster values
+### 1. Review cluster and manifests
 
 ```bash
 oc get -o jsonpath='{.status.infrastructureName}{"\n"}' infrastructure cluster
@@ -21,19 +21,11 @@ oc get machineset -n openshift-machine-api
 oc get nodes -l node-role.kubernetes.io/infra
 ```
 
-Copy an existing **worker** `MachineSet` in your cluster and use it as the source of truth for `providerSpec` (AMI, subnets, security groups, instance type).
+MachineSets target cluster **`gitops-tfhd4`**, instance type **`m6i.xlarge`**, AMI **`ami-0b8c325b7499597c6`**, private subnets per zone. Edit the YAML if your cluster IDs differ.
 
-### 2. Customize the MachineSet manifests
+If you use GitOps, the same manifests live under **`clusters/phased/infra-nodes/`** (keep both locations in sync).
 
-Edit **`machineset-infra-aws-zone-a.yaml`** and **`machineset-infra-aws-zone-b.yaml`**:
-
-- Replace every `REPLACE_*` token (infrastructure ID, region, zones, AMI, and so on).
-- Use **different** availability zones for zone A and zone B.
-- For other clouds, follow the platform section in [Creating infrastructure machine sets](https://docs.redhat.com/en/documentation/openshift_container_platform/4.22/html/machine_management/creating-infrastructure-machinesets#machineset-yaml-aws_creating-infrastructure-machinesets) and add your own YAML alongside these AWS examples.
-
-If you use GitOps, apply the same edits under **`clusters/phased/infra-nodes/`** (copies used by Argo CD).
-
-### 3. Apply MachineSets (or sync via GitOps)
+### 2. Apply MachineSets (or sync via GitOps)
 
 ```bash
 oc apply -f ./machineset-infra-aws-zone-a.yaml
@@ -42,7 +34,7 @@ oc apply -f ./machineset-infra-aws-zone-b.yaml
 
 Or enable **`day2-infra-nodes`** in `gitops/bootstrap/kustomization.yaml` and let Argo CD sync `clusters/phased/infra-nodes/`.
 
-### 4. Wait for infra nodes
+### 3. Wait for infra nodes
 
 ```bash
 oc get machineset -n openshift-machine-api
@@ -52,11 +44,11 @@ oc get nodes -l node-role.kubernetes.io/infra
 
 Expect **at least two** nodes with roles including **`infra`** (and typically **`worker`**).
 
-### 5. Resolve misscheduled DNS pods (if tainted)
+### 4. Resolve misscheduled DNS pods (if tainted)
 
 After the infra taint is applied, fix any misscheduled DNS pods per the product doc (delete pods or add tolerations).
 
-### 6. Validate before the next topic
+### 5. Validate before the next topic
 
 Do **not** enable ingress, registry, or monitoring placement until **≥ 2 infra nodes** are **Ready**.
 

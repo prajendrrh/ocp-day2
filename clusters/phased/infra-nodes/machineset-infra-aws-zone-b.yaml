@@ -1,11 +1,10 @@
-# AWS infrastructure MachineSet — zone B (second infra node for HA).
-# Use a different availability zone than zone A. Customize before apply.
+# Copy of infra-nodes-configuration/machineset-infra-aws-zone-b.yaml (keep in sync).
 apiVersion: machine.openshift.io/v1beta1
 kind: MachineSet
 metadata:
   labels:
-    machine.openshift.io/cluster-api-cluster: REPLACE_INFRASTRUCTURE_ID
-  name: REPLACE_INFRASTRUCTURE_ID-infra-REPLACE_ZONE_B
+    machine.openshift.io/cluster-api-cluster: gitops-tfhd4
+  name: gitops-tfhd4-infra-eu-west-1b
   namespace: openshift-machine-api
   annotations:
     argocd.argoproj.io/sync-wave: "5"
@@ -13,15 +12,15 @@ spec:
   replicas: 1
   selector:
     matchLabels:
-      machine.openshift.io/cluster-api-cluster: REPLACE_INFRASTRUCTURE_ID
-      machine.openshift.io/cluster-api-machineset: REPLACE_INFRASTRUCTURE_ID-infra-REPLACE_ZONE_B
+      machine.openshift.io/cluster-api-cluster: gitops-tfhd4
+      machine.openshift.io/cluster-api-machineset: gitops-tfhd4-infra-eu-west-1b
   template:
     metadata:
       labels:
-        machine.openshift.io/cluster-api-cluster: REPLACE_INFRASTRUCTURE_ID
+        machine.openshift.io/cluster-api-cluster: gitops-tfhd4
         machine.openshift.io/cluster-api-machine-role: infra
         machine.openshift.io/cluster-api-machine-type: infra
-        machine.openshift.io/cluster-api-machineset: REPLACE_INFRASTRUCTURE_ID-infra-REPLACE_ZONE_B
+        machine.openshift.io/cluster-api-machineset: gitops-tfhd4-infra-eu-west-1b
     spec:
       metadata:
         labels:
@@ -29,7 +28,7 @@ spec:
       providerSpec:
         value:
           ami:
-            id: REPLACE_RHCOS_AMI_ID
+            id: ami-0b8c325b7499597c6
           apiVersion: machine.openshift.io/v1beta1
           blockDevices:
             - ebs:
@@ -40,28 +39,28 @@ spec:
             name: aws-cloud-credentials
           deviceIndex: 0
           iamInstanceProfile:
-            id: REPLACE_INFRASTRUCTURE_ID-worker-profile
-          instanceType: m6i.large
+            id: gitops-tfhd4-worker-profile
+          instanceType: m6i.xlarge
           kind: AWSMachineProviderConfig
           placement:
-            availabilityZone: REPLACE_ZONE_B
-            region: REPLACE_REGION
+            availabilityZone: eu-west-1b
+            region: eu-west-1
           securityGroups:
             - filters:
                 - name: tag:Name
                   values:
-                    - REPLACE_INFRASTRUCTURE_ID-node
+                    - gitops-tfhd4-node
             - filters:
                 - name: tag:Name
                   values:
-                    - REPLACE_INFRASTRUCTURE_ID-lb
+                    - gitops-tfhd4-lb
           subnet:
             filters:
               - name: tag:Name
                 values:
-                  - REPLACE_INFRASTRUCTURE_ID-subnet-private-REPLACE_ZONE_B
+                  - gitops-tfhd4-subnet-private-eu-west-1b
           tags:
-            - name: kubernetes.io/cluster/REPLACE_INFRASTRUCTURE_ID
+            - name: kubernetes.io/cluster/gitops-tfhd4
               value: owned
           userDataSecret:
             name: worker-user-data
