@@ -11,7 +11,7 @@ Keep `manifests/` copies in sync with sibling `clusters/phased/*` bundles when e
 | -10 | Argo CD application-controller RBAC |
 | 0 | `wait-job` ServiceAccount + read-only ClusterRole for hooks |
 | 1 | NTP `MachineConfig` (worker pool) |
-| 2 | **Job:** worker `MachineConfigPool` Updated |
+| 2 | **Job:** worker MCP includes `99-worker-chrony`, then all nodes updated/ready |
 | 3 | Infra `MachineSet`s (×2) |
 | 4 | **Job:** ≥ `MIN_INFRA_NODES` infra nodes Ready (default **2**) |
 | 5 | Ingress + registry + monitoring (same wave, no waits between) |

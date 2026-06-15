@@ -17,7 +17,7 @@ After the OpenShift GitOps operator is running and **`day2-root`** is applied, A
 
 | Step | Wait before next step |
 |------|------------------------|
-| NTP → infra MachineSets | Worker MCP **Updated** (wait Job) |
+| NTP → infra MachineSets | Worker MCP picked up `99-worker-chrony` and all workers updated/ready (wait Job) |
 | Infra MachineSets → ingress/registry/monitoring | Infra nodes **Ready** (wait Job) |
 | Ingress / registry / monitoring | None (same sync wave) |
 | Workloads → etcd | None (etcd is last wave) |
