@@ -1,4 +1,4 @@
-# Step 3: image registry on infra. Enable after day2-ingress-on-infra is healthy.
+# Registry on infra (wave 5) → 10m delay (wave 10). App wave 50.
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
@@ -15,3 +15,7 @@ spec:
   destination:
     server: https://kubernetes.default.svc
     namespace: openshift-gitops
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true

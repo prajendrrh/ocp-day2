@@ -1,0 +1,26 @@
+# Argo CD Sync hook: pause after registry move before monitoring move.
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: delay-after-registry-on-infra
+  namespace: openshift-gitops
+  annotations:
+    argocd.argoproj.io/hook: Sync
+    argocd.argoproj.io/sync-wave: "10"
+    argocd.argoproj.io/hook-delete-policy: BeforeHookCreation,HookSucceeded
+spec:
+  ttlSecondsAfterFinished: 600
+  activeDeadlineSeconds: 900
+  backoffLimit: 0
+  template:
+    spec:
+      restartPolicy: Never
+      containers:
+        - name: wait
+          image: registry.redhat.io/ubi9/ubi-minimal:latest
+          command:
+            - /bin/bash
+            - -c
+            - |
+              echo "Waiting 10 minutes after registry on infra before monitoring move"
+              sleep 600

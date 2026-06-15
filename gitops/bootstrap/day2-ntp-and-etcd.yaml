@@ -1,9 +1,11 @@
-# One Application: NTP MachineConfig (sync wave 5) then APIServer encryption (wave 20).
+# One Application: NTP (wave 5) → 20m delay (wave 10) → etcd (wave 20).
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
   name: day2-ntp-and-etcd
   namespace: openshift-gitops
+  annotations:
+    argocd.argoproj.io/sync-wave: "5"
 spec:
   project: day2-ops
   source:

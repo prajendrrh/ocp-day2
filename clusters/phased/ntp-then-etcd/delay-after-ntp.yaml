@@ -1,0 +1,26 @@
+# Argo CD Sync hook: pause after NTP MachineConfig before etcd encryption (worker MCP rollouts).
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: delay-after-ntp
+  namespace: openshift-gitops
+  annotations:
+    argocd.argoproj.io/hook: Sync
+    argocd.argoproj.io/sync-wave: "10"
+    argocd.argoproj.io/hook-delete-policy: BeforeHookCreation,HookSucceeded
+spec:
+  ttlSecondsAfterFinished: 600
+  activeDeadlineSeconds: 1500
+  backoffLimit: 0
+  template:
+    spec:
+      restartPolicy: Never
+      containers:
+        - name: wait
+          image: registry.redhat.io/ubi9/ubi-minimal:latest
+          command:
+            - /bin/bash
+            - -c
+            - |
+              echo "Waiting 20 minutes after NTP MachineConfig before APIServer etcd encryption"
+              sleep 1200

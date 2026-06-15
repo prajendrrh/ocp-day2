@@ -5,37 +5,26 @@ This repository is a structured proof of concept (PoC) for **OpenShift Day 2 ope
 - **GitOps path (recommended for SSOT):** cluster configuration is **configuration as code**—manifests and Kustomize under `clusters/` and `gitops/`, reconciled by OpenShift GitOps. After the operator is running, **ongoing** Day 2 changes are Git commits only. A small **bootstrap script** (`scripts/bootstrap-fresh-cluster.sh`) is optional glue for a brand-new cluster (install operator, wait, apply root `Application`); it does not replace GitOps for configuration.
 - **Topic runbooks:** optional narrative folders (sometimes with `oc` examples for learning, troubleshooting, or one-off tasks). They are not required when you manage the cluster through GitOps.
 
-## New cluster: phased validation (GitOps first, then NTP + etcd automatically)
+## New cluster: fully automated GitOps rollout
 
-The default bootstrap uses a **single child Application** (**`day2-ntp-and-etcd`**) so Argo CD applies **MachineConfig (NTP) before APIServer (etcd encryption)** using sync waves—**no manual “Sync” clicks** for NTP or etcd once `day2-root` is syncing.
+After the OpenShift GitOps operator is running and **`day2-root`** is applied, Argo CD **automatically** syncs all Day 2 use cases in order—**no manual Sync clicks** and **no `oc apply`** for manifests in this repo.
 
-1. **Confirm Git remote** — `repoURL` / `targetRevision` default to **`https://github.com/prajendrrh/ocp-day2.git`** and **`main`** in `gitops/argocd/root-application.yaml` and in each `gitops/bootstrap/day2-*.yaml` you enable. Change them if you use another fork or branch.
-2. **Unattended install (recommended on a fresh cluster):** from a clone of this repo, with `KUBECONFIG` pointing at the cluster and **cluster-admin**:
+1. **Confirm Git remote** — `repoURL` / `targetRevision` default to **`https://github.com/prajendrrh/ocp-day2.git`** and **`main`**.
+2. **Bootstrap (once per cluster):** run [`scripts/bootstrap-fresh-cluster.sh`](scripts/bootstrap-fresh-cluster.sh) or apply `gitops/argocd/root-application.yaml` after the operator is ready.
+3. **Watch** — `oc get applications.argoproj.io -n openshift-gitops` and the Argo CD UI. Total elapsed time includes built-in **delay hooks** (see [timing](#automated-timing) below).
 
-   ```bash
-   ./scripts/bootstrap-fresh-cluster.sh
-   ```
+### Automated timing
 
-   That installs the OpenShift GitOps operator, waits until Argo CD is ready, applies **`day2-root`**, and Argo CD then **automatically** syncs NTP and etcd in order. If the repo is private, create a Git credential `Secret` in `openshift-gitops` before or after the script (see [`gitops/README.md`](gitops/README.md)).
+| Step | Wait before next step |
+|------|------------------------|
+| NTP MachineConfig → etcd encryption | **20 minutes** (worker MCP rollouts) |
+| Infra MachineSets → move ingress | **20 minutes** (node provisioning) |
+| Ingress → registry | **10 minutes** |
+| Registry → monitoring | **10 minutes** |
 
-3. **Validate** — watch `oc get applications.argoproj.io -n openshift-gitops`, MachineConfig pools, and API server encryption status per [`etcd-encryption/README.md`](etcd-encryption/README.md) and [`ntp-chrony-configuration/README.md`](ntp-chrony-configuration/README.md).
+Details and tuning: [`clusters/phased/README.md`](clusters/phased/README.md).
 
-4. **Add more topics** — when NTP + etcd are solid, enable infra topics **one Argo CD Application at a time** (see [Infrastructure rollout](#infrastructure-rollout-ordered) below), or uncomment lines in [`gitops/bootstrap/kustomization.yaml`](gitops/bootstrap/kustomization.yaml).
-
-## Infrastructure rollout (ordered)
-
-After GitOps, NTP, and etcd are validated, add infrastructure placement **in this order** (each step depends on the previous):
-
-| Order | Topic | Argo CD Application (when using GitOps) |
-|-------|--------|----------------------------------------|
-| 1 | [`infra-nodes-configuration/`](infra-nodes-configuration/README.md) — ≥ 2 infra nodes | `day2-infra-nodes` |
-| 2 | [`ingress-on-infra/`](ingress-on-infra/README.md) — default router | `day2-ingress-on-infra` |
-| 3 | [`registry-on-infra/`](registry-on-infra/README.md) — image registry | `day2-registry-on-infra` |
-| 4 | [`monitoring-on-infra/`](monitoring-on-infra/README.md) — cluster monitoring | `day2-monitoring-on-infra` |
-
-Infra MachineSets are preconfigured for cluster **`gitops-tfhd4`** in **eu-west-1a** / **eu-west-1b**; edit manifests if your cluster differs. Infra Applications use **manual** sync by default—sync and validate each app before uncommenting the next in `gitops/bootstrap/kustomization.yaml`.
-
-**Manual alternative:** install the operator and root `Application` step-by-step as in [`openshift-gitops-operator/README.md`](openshift-gitops-operator/README.md) and [`gitops/README.md`](gitops/README.md). For `kubectl` / `oc apply -k` against `clusters/all/*` paths, you may need `--load-restrictor=LoadRestrictionsNone` (see script); Argo CD is configured in the `Application` manifests to use the same so builds from Git succeed.
+**Caveats:** delay Jobs use `registry.redhat.io/ubi9/ubi-minimal` (must be pullable). Hooks enforce **minimum** wait time—they do not wait for every node reboot or operator condition. Large clusters may need longer `sleep` values in the `delay-*.yaml` Jobs.
 
 ## Environment
 
@@ -74,7 +63,7 @@ To manage manifests with **OpenShift GitOps** (Argo CD), use the Kustomize paths
 
 ## Quick start
 
-**New cluster:** follow **New cluster: phased validation** above (GitOps → NTP → etcd), then [`gitops/README.md`](gitops/README.md).
+**New cluster:** follow **New cluster: fully automated GitOps rollout** above, then [`gitops/README.md`](gitops/README.md).
 
 **Runbook (optional):** open any topic folder and follow its `README.md` for a guided walkthrough.
 

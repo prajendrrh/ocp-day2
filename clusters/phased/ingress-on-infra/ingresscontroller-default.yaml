@@ -5,6 +5,8 @@ kind: IngressController
 metadata:
   name: default
   namespace: openshift-ingress-operator
+  annotations:
+    argocd.argoproj.io/sync-wave: "5"
 spec:
   nodePlacement:
     nodeSelector:

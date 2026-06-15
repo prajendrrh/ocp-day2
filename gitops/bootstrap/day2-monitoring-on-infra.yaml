@@ -1,4 +1,4 @@
-# Step 4: monitoring on infra. Enable after day2-registry-on-infra is healthy.
+# Monitoring on infra. App wave 60 (last step).
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
@@ -15,3 +15,7 @@ spec:
   destination:
     server: https://kubernetes.default.svc
     namespace: openshift-gitops
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true

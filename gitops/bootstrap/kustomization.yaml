@@ -1,21 +1,16 @@
 # Renders child Argo CD Applications (app-of-apps). Synced by day2-root Application.
 #
-# All resource paths are under this directory so `kustomize build` succeeds under
-# Argo CD's default load restrictions (no ../ references).
-#
-# Default: NTP + etcd (automated via day2-ntp-and-etcd).
-# Infra rollout (manual sync, strict order): enable one line at a time after validating the previous step:
-#   1. day2-infra-nodes → 2. day2-ingress-on-infra → 3. day2-registry-on-infra → 4. day2-monitoring-on-infra
+# Fully automated rollout: all child Applications use syncPolicy.automated and ordered
+# sync-waves with in-app delay Jobs (see clusters/phased/README.md).
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 resources:
   - day2-appproject.yaml
   - day2-ntp-and-etcd.yaml
+  - day2-infra-nodes.yaml
+  - day2-ingress-on-infra.yaml
+  - day2-registry-on-infra.yaml
+  - day2-monitoring-on-infra.yaml
   # Optional split apps (use instead of day2-ntp-and-etcd if you prefer):
   # - day2-ntp-chrony.yaml
   # - day2-etcd-encryption.yaml
-  # Infra rollout (one Application at a time; validate each step before enabling the next):
-  # - day2-infra-nodes.yaml
-  # - day2-ingress-on-infra.yaml
-  # - day2-registry-on-infra.yaml
-  # - day2-monitoring-on-infra.yaml
