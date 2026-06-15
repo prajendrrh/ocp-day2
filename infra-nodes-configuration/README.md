@@ -55,7 +55,7 @@ Do **not** enable ingress, registry, or monitoring placement until **≥ 2 infra
 ## Expected output
 
 - Two (or more) nodes labeled `node-role.kubernetes.io/infra`
-- Infra nodes carry the `node-role.kubernetes.io/infra` **NoSchedule** taint
+- Infra nodes carry the `node-role.kubernetes.io/infra=reserved:NoSchedule` taint (must match tolerations on ingress, registry, and monitoring)
 
 ## References
 
