@@ -1,0 +1,70 @@
+# Copy of infra-nodes-configuration/machineset-infra-aws-zone-a.yaml (keep in sync).
+apiVersion: machine.openshift.io/v1beta1
+kind: MachineSet
+metadata:
+  labels:
+    machine.openshift.io/cluster-api-cluster: gitops-tfhd4
+  name: gitops-tfhd4-infra-eu-west-1a
+  namespace: openshift-machine-api
+  annotations:
+    argocd.argoproj.io/sync-wave: "5"
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      machine.openshift.io/cluster-api-cluster: gitops-tfhd4
+      machine.openshift.io/cluster-api-machineset: gitops-tfhd4-infra-eu-west-1a
+  template:
+    metadata:
+      labels:
+        machine.openshift.io/cluster-api-cluster: gitops-tfhd4
+        machine.openshift.io/cluster-api-machine-role: infra
+        machine.openshift.io/cluster-api-machine-type: infra
+        machine.openshift.io/cluster-api-machineset: gitops-tfhd4-infra-eu-west-1a
+    spec:
+      metadata:
+        labels:
+          node-role.kubernetes.io/infra: ""
+      providerSpec:
+        value:
+          ami:
+            id: ami-0b8c325b7499597c6
+          apiVersion: machine.openshift.io/v1beta1
+          blockDevices:
+            - ebs:
+                iops: 0
+                volumeSize: 120
+                volumeType: gp3
+          credentialsSecret:
+            name: aws-cloud-credentials
+          deviceIndex: 0
+          iamInstanceProfile:
+            id: gitops-tfhd4-worker-profile
+          instanceType: m6i.xlarge
+          kind: AWSMachineProviderConfig
+          placement:
+            availabilityZone: eu-west-1a
+            region: eu-west-1
+          securityGroups:
+            - filters:
+                - name: tag:Name
+                  values:
+                    - gitops-tfhd4-node
+            - filters:
+                - name: tag:Name
+                  values:
+                    - gitops-tfhd4-lb
+          subnet:
+            filters:
+              - name: tag:Name
+                values:
+                  - gitops-tfhd4-subnet-private-eu-west-1a
+          tags:
+            - name: kubernetes.io/cluster/gitops-tfhd4
+              value: owned
+          userDataSecret:
+            name: worker-user-data
+      taints:
+        - key: node-role.kubernetes.io/infra
+          effect: NoSchedule
+          value: reserved

@@ -1,0 +1,20 @@
+# Copy of ntp-chrony-configuration/99-worker-chrony.yaml with Argo sync wave (keep in sync when editing the topic).
+apiVersion: machineconfiguration.openshift.io/v1
+kind: MachineConfig
+metadata:
+  name: 99-worker-chrony
+  labels:
+    machineconfiguration.openshift.io/role: worker
+  annotations:
+    argocd.argoproj.io/sync-wave: "5"
+spec:
+  config:
+    ignition:
+      version: 3.2.0
+    storage:
+      files:
+        - path: /etc/chrony.conf
+          mode: 420
+          overwrite: true
+          contents:
+            source: data:text/plain;charset=utf-8;base64,IyBjaHJvbnkuY29uZiBmb3IgT3BlblNoaWZ0IHdvcmtlcnMKcG9vbCAyLnJoZWwucG9vbC5udHAub3JnIGlidXJzdAoKIyBSZWNvbW1lbmRlZCBkZWZhdWx0cyBmb3IgY2hyb255IG9uIFJIQ09TCmRyaWZ0ZmlsZSAvdmFyL2xpYi9jaHJvbnkvZHJpZnQKcnRjc3luYwprZXlmaWxlIC9ldGMvY2hyb255LmtleXMKbG9nZGlyIC92YXIvbGliL2Nocm9ueQo=
