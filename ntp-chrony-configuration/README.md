@@ -1,6 +1,6 @@
 # Configure NTP servers (chrony) via MachineConfig
 
-This topic configures node time synchronization by **overriding `/etc/chrony.conf`** on OpenShift nodes using a `MachineConfig`.
+This topic configures node time synchronization by **overriding `/etc/chrony.conf`** on worker nodes using a `MachineConfig`. The default source is **`pool 2.rhel.pool.ntp.org iburst`** (Red Hat’s public NTP pool). Ensure worker nodes can reach it on the network (UDP 123); use a different pool or enterprise servers if your policy requires it.
 
 ## Prerequisites
 
@@ -16,9 +16,9 @@ This topic configures node time synchronization by **overriding `/etc/chrony.con
 oc debug node/<any-node> -- chroot /host bash -lc 'chronyc sources -v || true; chronyc tracking || true'
 ```
 
-### 2. Update the MachineConfig example
+### 2. Review or change NTP sources (optional)
 
-Edit `99-worker-chrony.yaml` and replace the example NTP servers.
+The manifest uses `pool 2.rhel.pool.ntp.org iburst`. To use another source, edit `99-worker-chrony.yaml` (and the copy under `clusters/phased/ntp-then-etcd/` if you use GitOps), regenerate the base64 `contents.source`, commit, and sync.
 
 ### 3. Apply the MachineConfig
 
