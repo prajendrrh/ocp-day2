@@ -11,8 +11,6 @@ spec:
     repoURL: https://github.com/prajendrrh/ocp-day2.git
     targetRevision: main
     path: clusters/phased/day2-rollout
-    kustomize:
-      buildOptions: --load-restrictor LoadRestrictionsNone
   destination:
     server: https://kubernetes.default.svc
     namespace: openshift-gitops

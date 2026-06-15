@@ -2,7 +2,7 @@
 
 One Argo CD `Application` (`day2-rollout-sequential`) applies **all** Day 2 use cases in a **single sync** with global sync waves and **readiness** hook Jobs (not fixed sleeps).
 
-Reuses manifests from sibling `clusters/phased/*` bundles (no duplicate YAML). Kustomize references parent paths, so the Application sets `buildOptions: --load-restrictor LoadRestrictionsNone`.
+Self-contained Kustomize root (manifests under `manifests/` and `rbac/`). Argo CD does **not** need `buildOptions: --load-restrictor LoadRestrictionsNone`. Keep copies in sync with sibling phased bundles when editing.
 
 ## Do not run both rollout modes on one cluster
 
