@@ -1,7 +1,6 @@
-# Copies of infra-nodes-configuration/* (keep in sync). Customize REPLACE_* before GitOps sync.
+# Copies of infra-nodes-configuration MachineSets (keep in sync). Customize REPLACE_* before GitOps sync.
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 resources:
   - machineset-infra-aws-zone-a.yaml
   - machineset-infra-aws-zone-b.yaml
-  - machineconfigpool-infra.yaml

@@ -1,6 +1,8 @@
 # Configure infrastructure nodes
 
-Create **at least two** infrastructure nodes (recommended across two availability zones), an **infra** `MachineConfigPool`, and the **infra** node label + taint pattern from the OpenShift 4.22 docs. **Complete and validate this topic before** moving ingress, registry, or monitoring.
+Create **at least two** infrastructure nodes (recommended across two availability zones) using infrastructure `MachineSet`s with the **infra** node label and taint from the OpenShift 4.22 docs. **Complete and validate this topic before** moving ingress, registry, or monitoring.
+
+This PoC does **not** create a dedicated infra `MachineConfigPool`; infra nodes use the default worker machine config pool unless you add one separately.
 
 ## Prerequisites
 
@@ -16,7 +18,7 @@ Create **at least two** infrastructure nodes (recommended across two availabilit
 ```bash
 oc get -o jsonpath='{.status.infrastructureName}{"\n"}' infrastructure cluster
 oc get machineset -n openshift-machine-api
-oc get nodes -L node-role.kubernetes.io/infra
+oc get nodes -l node-role.kubernetes.io/infra
 ```
 
 Copy an existing **worker** `MachineSet` in your cluster and use it as the source of truth for `providerSpec` (AMI, subnets, security groups, instance type).
@@ -31,24 +33,24 @@ Edit **`machineset-infra-aws-zone-a.yaml`** and **`machineset-infra-aws-zone-b.y
 
 If you use GitOps, apply the same edits under **`clusters/phased/infra-nodes/`** (copies used by Argo CD).
 
-### 3. Apply MachineSets and MachineConfigPool
+### 3. Apply MachineSets (or sync via GitOps)
 
 ```bash
-oc apply -f ./machineconfigpool-infra.yaml
 oc apply -f ./machineset-infra-aws-zone-a.yaml
 oc apply -f ./machineset-infra-aws-zone-b.yaml
 ```
 
-### 4. Wait for infra nodes and MCP
+Or enable **`day2-infra-nodes`** in `gitops/bootstrap/kustomization.yaml` and let Argo CD sync `clusters/phased/infra-nodes/`.
+
+### 4. Wait for infra nodes
 
 ```bash
 oc get machineset -n openshift-machine-api
 oc get machine -n openshift-machine-api
-oc get nodes -L node-role.kubernetes.io/infra
-oc get mcp infra
+oc get nodes -l node-role.kubernetes.io/infra
 ```
 
-Expect **at least two** nodes with roles including **`infra`** (and typically **`worker`**). Wait until `mcp/infra` reports **UPDATED=True**.
+Expect **at least two** nodes with roles including **`infra`** (and typically **`worker`**).
 
 ### 5. Resolve misscheduled DNS pods (if tainted)
 
@@ -56,20 +58,14 @@ After the infra taint is applied, fix any misscheduled DNS pods per the product 
 
 ### 6. Validate before the next topic
 
-Do **not** enable ingress, registry, or monitoring placement until:
-
-- ≥ 2 infra nodes are **Ready**
-- `mcp/infra` is healthy
-- You can schedule a test pod with the infra toleration (optional)
+Do **not** enable ingress, registry, or monitoring placement until **≥ 2 infra nodes** are **Ready**.
 
 ## Expected output
 
 - Two (or more) nodes labeled `node-role.kubernetes.io/infra`
-- `MachineConfigPool/infra` exists and is updated
 - Infra nodes carry the `node-role.kubernetes.io/infra` **NoSchedule** taint
 
 ## References
 
 - [Creating infrastructure machine sets (AWS sample)](https://docs.redhat.com/en/documentation/openshift_container_platform/4.22/html/machine_management/creating-infrastructure-machinesets#machineset-yaml-aws_creating-infrastructure-machinesets)
-- [Creating a machine config pool for infrastructure machines](https://docs.redhat.com/en/documentation/openshift_container_platform/4.22/html/machine_management/creating-infrastructure-machinesets#creating-a-machine-config-pool-for-infrastructure-machines_creating-infrastructure-machinesets)
 - [Moving resources to infrastructure machine sets (overview)](https://docs.redhat.com/en/documentation/openshift_container_platform/4.22/html/machine_management/creating-infrastructure-machinesets#moving-resources-to-infrastructure-machinesets)

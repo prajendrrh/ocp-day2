@@ -1,4 +1,4 @@
-# Step 1 of infra rollout: MachineSets + infra MCP. Manual sync — validate ≥2 infra nodes before enabling the next app.
+# Step 1 of infra rollout: infrastructure MachineSets. Manual sync — validate ≥2 infra nodes before enabling the next app.
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:

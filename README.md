@@ -28,7 +28,7 @@ After GitOps, NTP, and etcd are validated, add infrastructure placement **in thi
 
 | Order | Topic | Argo CD Application (when using GitOps) |
 |-------|--------|----------------------------------------|
-| 1 | [`infra-nodes-configuration/`](infra-nodes-configuration/README.md) — ≥ 2 infra nodes, MCP | `day2-infra-nodes` |
+| 1 | [`infra-nodes-configuration/`](infra-nodes-configuration/README.md) — ≥ 2 infra nodes | `day2-infra-nodes` |
 | 2 | [`ingress-on-infra/`](ingress-on-infra/README.md) — default router | `day2-ingress-on-infra` |
 | 3 | [`registry-on-infra/`](registry-on-infra/README.md) — image registry | `day2-registry-on-infra` |
 | 4 | [`monitoring-on-infra/`](monitoring-on-infra/README.md) — cluster monitoring | `day2-monitoring-on-infra` |
@@ -50,7 +50,7 @@ Topic folders use **descriptive names** (no numeric prefixes). For a new cluster
 | Folder | Summary |
 |--------|---------|
 | [`openshift-gitops-operator/`](openshift-gitops-operator/README.md) | Install the Red Hat OpenShift GitOps operator (OLM); do this **first** on a new cluster |
-| [`infra-nodes-configuration/`](infra-nodes-configuration/README.md) | Create ≥ 2 infrastructure nodes (MachineSet + MCP); **first** infra step |
+| [`infra-nodes-configuration/`](infra-nodes-configuration/README.md) | Create ≥ 2 infrastructure nodes (MachineSet); **first** infra step |
 | [`ingress-on-infra/`](ingress-on-infra/README.md) | Move default ingress router to infra nodes |
 | [`registry-on-infra/`](registry-on-infra/README.md) | Move integrated image registry to infra nodes |
 | [`monitoring-on-infra/`](monitoring-on-infra/README.md) | Move cluster monitoring to infra nodes |

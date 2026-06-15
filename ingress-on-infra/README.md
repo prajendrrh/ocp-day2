@@ -2,7 +2,7 @@
 
 Move the **default** `IngressController` router pods to nodes labeled `node-role.kubernetes.io/infra`.
 
-**Prerequisite:** [`infra-nodes-configuration`](../infra-nodes-configuration/README.md) is complete (≥ 2 infra nodes, MCP healthy).
+**Prerequisite:** [`infra-nodes-configuration`](../infra-nodes-configuration/README.md) is complete (≥ 2 infra nodes ready).
 
 ## Prerequisites
 
