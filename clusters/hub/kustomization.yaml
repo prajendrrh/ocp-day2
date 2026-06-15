@@ -1,8 +1,0 @@
-# Optional single Argo CD Application path (spec.source.path: clusters/hub).
-# Same as day2-ntp-and-etcd: NTP (wave 5) then etcd APIServer (wave 20) via clusters/phased/ntp-then-etcd.
-# Do not add openshift-gitops-operator here—apply clusters/all/openshift-gitops-operator
-# before Argo CD exists on a new cluster.
-apiVersion: kustomize.config.k8s.io/v1beta1
-kind: Kustomization
-resources:
-  - ../phased/ntp-then-etcd
