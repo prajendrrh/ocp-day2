@@ -11,6 +11,3 @@ resources:
   - day2-ingress-on-infra.yaml
   - day2-registry-on-infra.yaml
   - day2-monitoring-on-infra.yaml
-  # Optional split apps (use instead of day2-ntp-and-etcd if you prefer):
-  # - day2-ntp-chrony.yaml
-  # - day2-etcd-encryption.yaml

@@ -5,13 +5,13 @@
 set -euo pipefail
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 
-if ! command -v oc >/dev/null 2>&1 || ! command -v kubectl >/dev/null 2>&1; then
-  echo "error: oc and kubectl must be in PATH" >&2
+if ! command -v oc >/dev/null 2>&1; then
+  echo "error: oc must be in PATH" >&2
   exit 1
 fi
 
 echo "==> Applying OpenShift GitOps operator (OLM)"
-kubectl kustomize --load-restrictor=LoadRestrictionsNone "${ROOT}/clusters/all/openshift-gitops-operator" | oc apply -f -
+oc apply -k "${ROOT}/clusters/phased/openshift-gitops-operator"
 
 echo "==> Waiting for ClusterServiceVersion (up to ~20 minutes on first install)"
 for _ in $(seq 1 120); do
@@ -39,8 +39,8 @@ else
     || oc wait --for=condition=Available deployment -n openshift-gitops --all --timeout=20m
 fi
 
-echo "==> Applying root Application (automated sync: NTP then etcd)"
+echo "==> Applying root Application (automated Day 2 rollout)"
 oc apply -f "${ROOT}/gitops/argocd/root-application.yaml"
 
 echo "==> Done. Watch: oc get applications.argoproj.io -n openshift-gitops"
-echo "    Argo CD will sync day2-root, then day2-ntp-and-etcd without manual Sync."
+echo "    Argo CD will sync day2-root and all child Applications without manual Sync."

@@ -25,14 +25,16 @@ MachineSets target cluster **`gitops-tfhd4`**, instance type **`m6i.xlarge`**, A
 
 If you use GitOps, the same manifests live under **`clusters/phased/infra-nodes/`** (keep both locations in sync).
 
-### 2. Apply MachineSets (or sync via GitOps)
+### 2. GitOps (default)
+
+With **`day2-infra-nodes`** enabled in `gitops/bootstrap/kustomization.yaml` (default), Argo CD applies these MachineSets automatically after NTP/etcd, waits **20 minutes** (delay hook), then the ingress app runs. No `oc apply` required.
+
+Optional manual apply:
 
 ```bash
 oc apply -f ./machineset-infra-aws-zone-a.yaml
 oc apply -f ./machineset-infra-aws-zone-b.yaml
 ```
-
-Or enable **`day2-infra-nodes`** in `gitops/bootstrap/kustomization.yaml` and let Argo CD sync `clusters/phased/infra-nodes/`.
 
 ### 3. Wait for infra nodes
 

@@ -1,11 +1,20 @@
 # Cluster layouts (GitOps)
 
-These paths are **configuration as code** only (Kustomize + referenced YAML). Argo CD builds and applies them; you do not run shell scripts from this repo to roll out what they describe.
+All cluster configuration consumed by OpenShift GitOps lives under **`clusters/phased/`**.
 
-- **`clusters/all/<component>/`** — small Kustomize bundles that point at YAML in **topic folders** at the repository root (for example `openshift-gitops-operator/`, `ntp-chrony-configuration/`, `etcd-encryption/`). Referenced by optional split Argo CD `Application` manifests in `gitops/bootstrap/` when enabled.
-- **`clusters/phased/`** — ordered bundles for GitOps: **NTP + etcd** (`ntp-then-etcd`), and **infra rollout** (`infra-nodes`, `ingress-on-infra`, `registry-on-infra`, `monitoring-on-infra`). Manifests stay under each phased directory for Argo CD load rules.
-- **`clusters/hub/`** — optional single Argo CD `Application` path; reuses `clusters/phased/ntp-then-etcd` for the same ordering. Does **not** include the GitOps operator—apply `clusters/all/openshift-gitops-operator` **before** Argo CD exists on a new cluster.
+Each subdirectory is a **self-contained** Kustomize root (manifests stay inside the path so Argo CD does not need `buildOptions: --load-restrictor LoadRestrictionsNone`).
 
-On a **new** cluster, apply **`clusters/all/openshift-gitops-operator`** first (see `openshift-gitops-operator/README.md` or run [`scripts/bootstrap-fresh-cluster.sh`](../scripts/bootstrap-fresh-cluster.sh)), then bootstrap Argo CD from `gitops/`.
+| Path | Applied by | Role |
+|------|------------|------|
+| `openshift-gitops-operator/` | Bootstrap script or `oc apply -k` **before** Argo CD exists | OLM install (not in app-of-apps) |
+| `ntp-then-etcd/` | `day2-ntp-and-etcd` | NTP chrony → delay → etcd encryption |
+| `infra-nodes/` | `day2-infra-nodes` | Infra MachineSets → delay |
+| `ingress-on-infra/` | `day2-ingress-on-infra` | Default ingress on infra → delay |
+| `registry-on-infra/` | `day2-registry-on-infra` | Image registry on infra → delay |
+| `monitoring-on-infra/` | `day2-monitoring-on-infra` | Cluster monitoring on infra |
 
-See `gitops/README.md` for install and bootstrap steps.
+Topic folders at the repository root (`ntp-chrony-configuration/`, `infra-nodes-configuration/`, etc.) are **runbooks** and authoring references. When you change YAML there, update the matching copy under `clusters/phased/<bundle>/` and commit both.
+
+Timing, sync waves, and delay hooks: [`phased/README.md`](phased/README.md).
+
+Bootstrap: [`scripts/bootstrap-fresh-cluster.sh`](../scripts/bootstrap-fresh-cluster.sh) or [`gitops/README.md`](../gitops/README.md).

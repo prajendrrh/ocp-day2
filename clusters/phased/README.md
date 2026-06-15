@@ -1,8 +1,21 @@
 # Phased GitOps bundles (Argo CD)
 
-Each path under `clusters/phased/` is a **self-contained** Kustomize root for one Argo CD `Application`. Resources use **sync waves**; **delay Jobs** (Argo CD `Sync` hooks) pause between major steps so the next wave does not start immediately.
+Everything under `clusters/phased/` is a **self-contained** Kustomize root. Manifests stay inside each directory so Argo CD does not need `buildOptions: --load-restrictor LoadRestrictionsNone`.
 
 Delay hook Jobs run in `openshift-gitops` and use `registry.redhat.io/ubi9/ubi-minimal` (cluster must pull from `registry.redhat.io`).
+
+## Bundles
+
+| Path | How it is applied |
+|------|-------------------|
+| `openshift-gitops-operator/` | **Before** Argo CD: `oc apply -k` or [`scripts/bootstrap-fresh-cluster.sh`](../../scripts/bootstrap-fresh-cluster.sh). Not in app-of-apps. |
+| `ntp-then-etcd/` | Argo CD `day2-ntp-and-etcd` |
+| `infra-nodes/` | Argo CD `day2-infra-nodes` |
+| `ingress-on-infra/` | Argo CD `day2-ingress-on-infra` |
+| `registry-on-infra/` | Argo CD `day2-registry-on-infra` |
+| `monitoring-on-infra/` | Argo CD `day2-monitoring-on-infra` |
+
+Keep phased copies in sync with topic folders at the repo root when you edit manifests.
 
 ## Application order (`day2-root` child apps)
 
@@ -30,7 +43,7 @@ The NTP `MachineConfig` triggers a **worker MCP rolling update** (reboots). Etcd
 
 ### Why delay infra → ingress?
 
-MachineSets must **provision** infra nodes and register them Ready. The **20-minute** hook after MachineSets matches the gap before moving the router (per your requirement).
+MachineSets must **provision** infra nodes and register them Ready. The **20-minute** hook after MachineSets runs before moving the router.
 
 ### Tuning delays
 

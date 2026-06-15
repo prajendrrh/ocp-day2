@@ -46,7 +46,7 @@ Topic folders use **descriptive names** (no numeric prefixes). For a new cluster
 | [`ntp-chrony-configuration/`](ntp-chrony-configuration/README.md) | NTP (chrony) via MachineConfig |
 | [`etcd-encryption/`](etcd-encryption/README.md) | Etcd encryption at rest |
 | [`topic-template/`](topic-template/README.md) | Copy as a starting point for new topics |
-| [`clusters/`](clusters/README.md) | Kustomize paths consumed by OpenShift GitOps |
+| [`clusters/phased/`](clusters/phased/README.md) | Self-contained Kustomize bundles for GitOps (all Day 2 use cases) |
 | [`gitops/`](gitops/README.md) | Argo CD `Application` and `AppProject` manifests |
 
 Each topic folder should contain:
@@ -56,10 +56,7 @@ Each topic folder should contain:
 
 ## GitOps (single source of truth)
 
-To manage manifests with **OpenShift GitOps** (Argo CD), use the Kustomize paths under `clusters/` and the bootstrap manifests under `gitops/`. Topic folders are the **authoring** location for YAML; `clusters/all/<component>/` references them so you do not maintain two copies. After GitOps is installed and the root `Application` exists, **ongoing Day 2 changes are commits to this repository**, not ad hoc shell.
-
-- Bootstrap and layout: [`gitops/README.md`](gitops/README.md)
-- Cluster entrypoints: [`clusters/README.md`](clusters/README.md)
+All cluster manifests consumed by Argo CD live under **`clusters/phased/`** (self-contained Kustomize bundles). Topic folders at the repo root are **runbooks** and authoring references—when you change YAML there, update the matching copy under `clusters/phased/<bundle>/`. Bootstrap and layout: [`gitops/README.md`](gitops/README.md), [`clusters/README.md`](clusters/README.md).
 
 ## Quick start
 
