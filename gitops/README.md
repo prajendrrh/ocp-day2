@@ -55,6 +55,19 @@ Tighten `spec.sourceRepos` in `gitops/bootstrap/day2-appproject.yaml` for produc
 
 To use **separate** Applications instead (for example manual etcd), replace `day2-ntp-and-etcd.yaml` in `gitops/bootstrap/kustomization.yaml` with the commented `day2-ntp-chrony.yaml` / `day2-etcd-encryption.yaml` lines and tune `syncPolicy` on etcd as needed.
 
+### Infrastructure rollout (ordered, manual sync)
+
+Enable **one** infra `Application` at a time in `gitops/bootstrap/kustomization.yaml`. Each file uses an Argo CD **sync-wave** annotation so when multiple are enabled, order is: **infra nodes (30) → ingress (40) → registry (50) → monitoring (60)**. None use automated `syncPolicy`—sync and validate in the UI/CLI before enabling the next.
+
+| Application | Path | Topic |
+|-------------|------|--------|
+| `day2-infra-nodes` | `clusters/phased/infra-nodes` | [`infra-nodes-configuration`](../infra-nodes-configuration/README.md) |
+| `day2-ingress-on-infra` | `clusters/phased/ingress-on-infra` | [`ingress-on-infra`](../ingress-on-infra/README.md) |
+| `day2-registry-on-infra` | `clusters/phased/registry-on-infra` | [`registry-on-infra`](../registry-on-infra/README.md) |
+| `day2-monitoring-on-infra` | `clusters/phased/monitoring-on-infra` | [`monitoring-on-infra`](../monitoring-on-infra/README.md) |
+
+Customize `REPLACE_*` in `clusters/phased/infra-nodes/` MachineSet YAML before syncing `day2-infra-nodes`. Keep copies in sync with the topic folder under `infra-nodes-configuration/`.
+
 ## Secrets and merge-sensitive resources
 
 Keep secrets out of plain Git when possible; use operators or controllers that materialize `Secret` objects from encrypted or external stores (Sealed Secrets, External Secrets Operator, vault agents, and so on)—those integrations are themselves configured with more YAML in Git.

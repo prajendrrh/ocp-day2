@@ -1,0 +1,17 @@
+# Step 2: default IngressController on infra. Enable after day2-infra-nodes is healthy.
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: day2-ingress-on-infra
+  namespace: openshift-gitops
+  annotations:
+    argocd.argoproj.io/sync-wave: "40"
+spec:
+  project: day2-ops
+  source:
+    repoURL: https://github.com/prajendrrh/ocp-day2.git
+    targetRevision: main
+    path: clusters/phased/ingress-on-infra
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: openshift-gitops

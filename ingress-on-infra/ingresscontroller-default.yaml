@@ -1,0 +1,16 @@
+# Move the default ingress router to infrastructure nodes.
+# Docs: https://docs.redhat.com/en/documentation/openshift_container_platform/4.22/html/machine_management/creating-infrastructure-machinesets#infrastructure-moving-router_creating-infrastructure-machinesets
+apiVersion: operator.openshift.io/v1
+kind: IngressController
+metadata:
+  name: default
+  namespace: openshift-ingress-operator
+spec:
+  nodePlacement:
+    nodeSelector:
+      matchLabels:
+        node-role.kubernetes.io/infra: ""
+    tolerations:
+      - effect: NoSchedule
+        key: node-role.kubernetes.io/infra
+        value: reserved

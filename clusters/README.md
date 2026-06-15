@@ -3,7 +3,7 @@
 These paths are **configuration as code** only (Kustomize + referenced YAML). Argo CD builds and applies them; you do not run shell scripts from this repo to roll out what they describe.
 
 - **`clusters/all/<component>/`** — small Kustomize bundles that point at YAML in **topic folders** at the repository root (for example `openshift-gitops-operator/`, `ntp-chrony-configuration/`, `etcd-encryption/`). Referenced by optional split Argo CD `Application` manifests in `gitops/bootstrap/` when enabled.
-- **`clusters/phased/`** — ordered bundles (e.g. **NTP then etcd** via sync waves) for a single Argo CD sync; used by **`day2-ntp-and-etcd`**.
+- **`clusters/phased/`** — ordered bundles for GitOps: **NTP + etcd** (`ntp-then-etcd`), and **infra rollout** (`infra-nodes`, `ingress-on-infra`, `registry-on-infra`, `monitoring-on-infra`). Manifests stay under each phased directory for Argo CD load rules.
 - **`clusters/hub/`** — optional single Argo CD `Application` path; reuses `clusters/phased/ntp-then-etcd` for the same ordering. Does **not** include the GitOps operator—apply `clusters/all/openshift-gitops-operator` **before** Argo CD exists on a new cluster.
 
 On a **new** cluster, apply **`clusters/all/openshift-gitops-operator`** first (see `openshift-gitops-operator/README.md` or run [`scripts/bootstrap-fresh-cluster.sh`](../scripts/bootstrap-fresh-cluster.sh)), then bootstrap Argo CD from `gitops/`.

@@ -3,8 +3,9 @@
 # All resource paths are under this directory so `kustomize build` succeeds under
 # Argo CD's default load restrictions (no ../ references).
 #
-# Default: one combined app (NTP then etcd via sync waves) so a fresh cluster can
-# converge without manual Sync clicks. Add more resources when you validate each topic.
+# Default: NTP + etcd (automated via day2-ntp-and-etcd).
+# Infra rollout (manual sync, strict order): enable one line at a time after validating the previous step:
+#   1. day2-infra-nodes → 2. day2-ingress-on-infra → 3. day2-registry-on-infra → 4. day2-monitoring-on-infra
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 resources:
@@ -13,3 +14,8 @@ resources:
   # Optional split apps (use instead of day2-ntp-and-etcd if you prefer):
   # - day2-ntp-chrony.yaml
   # - day2-etcd-encryption.yaml
+  # Infra rollout (one Application at a time; customize clusters/phased/infra-nodes REPLACE_* first):
+  # - day2-infra-nodes.yaml
+  # - day2-ingress-on-infra.yaml
+  # - day2-registry-on-infra.yaml
+  # - day2-monitoring-on-infra.yaml

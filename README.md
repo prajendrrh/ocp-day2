@@ -20,7 +20,20 @@ The default bootstrap uses a **single child Application** (**`day2-ntp-and-etcd`
 
 3. **Validate** — watch `oc get applications.argoproj.io -n openshift-gitops`, MachineConfig pools, and API server encryption status per [`etcd-encryption/README.md`](etcd-encryption/README.md) and [`ntp-chrony-configuration/README.md`](ntp-chrony-configuration/README.md).
 
-4. **Add more topics** — when this path is solid, uncomment or add one `Application` line at a time in [`gitops/bootstrap/kustomization.yaml`](gitops/bootstrap/kustomization.yaml), commit, let `day2-root` reconcile, and validate before adding the next.
+4. **Add more topics** — when NTP + etcd are solid, enable infra topics **one Argo CD Application at a time** (see [Infrastructure rollout](#infrastructure-rollout-ordered) below), or uncomment lines in [`gitops/bootstrap/kustomization.yaml`](gitops/bootstrap/kustomization.yaml).
+
+## Infrastructure rollout (ordered)
+
+After GitOps, NTP, and etcd are validated, add infrastructure placement **in this order** (each step depends on the previous):
+
+| Order | Topic | Argo CD Application (when using GitOps) |
+|-------|--------|----------------------------------------|
+| 1 | [`infra-nodes-configuration/`](infra-nodes-configuration/README.md) — ≥ 2 infra nodes, MCP | `day2-infra-nodes` |
+| 2 | [`ingress-on-infra/`](ingress-on-infra/README.md) — default router | `day2-ingress-on-infra` |
+| 3 | [`registry-on-infra/`](registry-on-infra/README.md) — image registry | `day2-registry-on-infra` |
+| 4 | [`monitoring-on-infra/`](monitoring-on-infra/README.md) — cluster monitoring | `day2-monitoring-on-infra` |
+
+Customize **`REPLACE_*`** placeholders in the infra MachineSet manifests (topic folder and `clusters/phased/infra-nodes/`) before the first sync. Infra Applications use **manual** sync by default—sync and validate each app before uncommenting the next in `gitops/bootstrap/kustomization.yaml`.
 
 **Manual alternative:** install the operator and root `Application` step-by-step as in [`openshift-gitops-operator/README.md`](openshift-gitops-operator/README.md) and [`gitops/README.md`](gitops/README.md). For `kubectl` / `oc apply -k` against `clusters/all/*` paths, you may need `--load-restrictor=LoadRestrictionsNone` (see script); Argo CD is configured in the `Application` manifests to use the same so builds from Git succeed.
 
@@ -37,6 +50,10 @@ Topic folders use **descriptive names** (no numeric prefixes). For a new cluster
 | Folder | Summary |
 |--------|---------|
 | [`openshift-gitops-operator/`](openshift-gitops-operator/README.md) | Install the Red Hat OpenShift GitOps operator (OLM); do this **first** on a new cluster |
+| [`infra-nodes-configuration/`](infra-nodes-configuration/README.md) | Create ≥ 2 infrastructure nodes (MachineSet + MCP); **first** infra step |
+| [`ingress-on-infra/`](ingress-on-infra/README.md) | Move default ingress router to infra nodes |
+| [`registry-on-infra/`](registry-on-infra/README.md) | Move integrated image registry to infra nodes |
+| [`monitoring-on-infra/`](monitoring-on-infra/README.md) | Move cluster monitoring to infra nodes |
 | [`ntp-chrony-configuration/`](ntp-chrony-configuration/README.md) | NTP (chrony) via MachineConfig |
 | [`etcd-encryption/`](etcd-encryption/README.md) | Etcd encryption at rest |
 | [`topic-template/`](topic-template/README.md) | Copy as a starting point for new topics |
