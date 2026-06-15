@@ -15,10 +15,18 @@ Delay hook Jobs run in `openshift-gitops` and use `registry.redhat.io/ubi9/ubi-m
 | `ingress-on-infra/` | Argo CD `day2-ingress-on-infra` |
 | `registry-on-infra/` | Argo CD `day2-registry-on-infra` |
 | `monitoring-on-infra/` | Argo CD `day2-monitoring-on-infra` |
+| `day2-rollout/` | **Experimental:** single app `day2-rollout-sequential` — true ordering + readiness hooks. See [`day2-rollout/README.md`](day2-rollout/README.md). |
 
 Keep phased copies in sync with topic folders at the repo root when you edit manifests.
 
-## Application order (`day2-root` child apps)
+## Rollout modes (pick one per cluster)
+
+| Mode | Bootstrap `kustomization.yaml` | Behavior |
+|------|-------------------------------|----------|
+| **Multi-app (default)** | `day2-argocd-rbac` + `day2-ntp-and-etcd` … `day2-monitoring-on-infra` | Parallel auto-sync across apps; sleep timers only |
+| **Sequential (experimental)** | `day2-rollout-sequential` only (comment out multi-app lines) | One sync; readiness hooks gate each step |
+
+## Application order — multi-app mode (`day2-root` child apps)
 
 | App sync wave | Application | What runs |
 |---------------|-------------|-----------|

@@ -1,0 +1,14 @@
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: day2-rollout-hooks
+  annotations:
+    argocd.argoproj.io/sync-wave: "-15"
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: day2-rollout-hooks
+subjects:
+  - kind: ServiceAccount
+    name: day2-rollout-hooks
+    namespace: openshift-gitops

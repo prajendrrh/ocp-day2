@@ -1,0 +1,49 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+resources:
+  - ../argocd-day2-rbac
+  - ../ntp-then-etcd/99-worker-chrony.yaml
+  - ../ntp-then-etcd/apiserver-encryption-aesgcm.yaml
+  - ../infra-nodes/machineset-infra-aws-zone-a.yaml
+  - ../infra-nodes/machineset-infra-aws-zone-b.yaml
+  - ../ingress-on-infra/ingresscontroller-default.yaml
+  - ../registry-on-infra/imageregistry-cluster.yaml
+  - ../monitoring-on-infra/cluster-monitoring-config.yaml
+  - hooks/serviceaccount.yaml
+  - hooks/clusterrole.yaml
+  - hooks/clusterrolebinding.yaml
+  - hooks/wait-worker-mcp.yaml
+  - hooks/wait-infra-nodes.yaml
+  - hooks/wait-ingress-on-infra.yaml
+  - hooks/wait-registry-on-infra.yaml
+  - hooks/wait-etcd-encryption.yaml
+
+configMapGenerator:
+  - name: day2-rollout-hook-scripts
+    namespace: openshift-gitops
+    files:
+      - hooks/scripts/wait-worker-mcp.sh
+      - hooks/scripts/wait-infra-nodes.sh
+      - hooks/scripts/wait-ingress-on-infra.sh
+      - hooks/scripts/wait-registry-on-infra.sh
+      - hooks/scripts/wait-etcd-encryption.sh
+    options:
+      annotations:
+        argocd.argoproj.io/sync-wave: "-15"
+
+generatorOptions:
+  disableNameSuffixHash: true
+
+patches:
+  - path: patches/clusterrole-wave.yaml
+  - path: patches/clusterrolebinding-wave.yaml
+  - path: patches/role-monitoring-wave.yaml
+  - path: patches/rolebinding-monitoring-wave.yaml
+  - path: patches/machineconfig-wave.yaml
+  - path: patches/apiserver-wave.yaml
+  - path: patches/machineset-a-wave.yaml
+  - path: patches/machineset-b-wave.yaml
+  - path: patches/ingress-wave.yaml
+  - path: patches/registry-wave.yaml
+  - path: patches/monitoring-wave.yaml

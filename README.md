@@ -22,7 +22,7 @@ After the OpenShift GitOps operator is running and **`day2-root`** is applied, A
 | Ingress → registry | **10 minutes** |
 | Registry → monitoring | **10 minutes** |
 
-Details and tuning: [`clusters/phased/README.md`](clusters/phased/README.md).
+Details and tuning: [`clusters/phased/README.md`](clusters/phased/README.md). For ordered rollout with readiness gates: [`clusters/phased/day2-rollout/README.md`](clusters/phased/day2-rollout/README.md).
 
 **Caveats:** delay Jobs use `registry.redhat.io/ubi9/ubi-minimal` (must be pullable). Hooks enforce **minimum** wait time—they do not wait for every node reboot or operator condition. Large clusters may need longer `sleep` values in the `delay-*.yaml` Jobs.
 
