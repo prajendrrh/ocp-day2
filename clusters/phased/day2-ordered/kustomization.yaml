@@ -1,0 +1,30 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+resources:
+  - rbac/clusterrole.yaml
+  - rbac/clusterrolebinding.yaml
+  - rbac/role-openshift-monitoring.yaml
+  - rbac/rolebinding-openshift-monitoring.yaml
+  - wait-job-rbac.yaml
+  - wait-jobs.yaml
+  - manifests/99-worker-chrony.yaml
+  - manifests/machineset-infra-aws-zone-a.yaml
+  - manifests/machineset-infra-aws-zone-b.yaml
+  - manifests/ingresscontroller-default.yaml
+  - manifests/imageregistry-cluster.yaml
+  - manifests/cluster-monitoring-config.yaml
+  - manifests/apiserver-encryption-aesgcm.yaml
+
+patches:
+  - path: patches/clusterrole-wave.yaml
+  - path: patches/clusterrolebinding-wave.yaml
+  - path: patches/role-monitoring-wave.yaml
+  - path: patches/rolebinding-monitoring-wave.yaml
+  - path: patches/ntp-wave.yaml
+  - path: patches/machineset-a-wave.yaml
+  - path: patches/machineset-b-wave.yaml
+  - path: patches/ingress-wave.yaml
+  - path: patches/registry-wave.yaml
+  - path: patches/monitoring-wave.yaml
+  - path: patches/apiserver-wave.yaml

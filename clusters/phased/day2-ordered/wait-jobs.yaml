@@ -1,0 +1,68 @@
+# Inline bash wait Jobs (ose-cli). Two gates: worker MCP, then infra nodes Ready.
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: wait-for-worker-mcp
+  namespace: openshift-gitops
+  annotations:
+    argocd.argoproj.io/hook: Sync
+    argocd.argoproj.io/sync-wave: "2"
+    argocd.argoproj.io/hook-delete-policy: BeforeHookCreation,HookSucceeded
+spec:
+  ttlSecondsAfterFinished: 600
+  activeDeadlineSeconds: 7200
+  backoffLimit: 0
+  template:
+    spec:
+      serviceAccountName: wait-job
+      restartPolicy: Never
+      containers:
+        - name: wait
+          image: registry.redhat.io/openshift4/ose-cli:latest
+          command:
+            - /bin/bash
+            - -c
+            - |
+              echo "Waiting for worker MachineConfigPool Updated=True, Updating!=True..."
+              until [ "$(oc get machineconfigpool worker -o jsonpath='{.status.conditions[?(@.type=="Updated")].status}' 2>/dev/null)" = "True" ] && \
+                    [ "$(oc get machineconfigpool worker -o jsonpath='{.status.conditions[?(@.type=="Updating")].status}' 2>/dev/null)" != "True" ]; do
+                echo "worker MCP not ready; sleeping 30s..."
+                sleep 30
+              done
+              echo "worker MCP updated."
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: wait-for-infra-nodes
+  namespace: openshift-gitops
+  annotations:
+    argocd.argoproj.io/hook: Sync
+    argocd.argoproj.io/sync-wave: "4"
+    argocd.argoproj.io/hook-delete-policy: BeforeHookCreation,HookSucceeded
+spec:
+  ttlSecondsAfterFinished: 600
+  activeDeadlineSeconds: 7200
+  backoffLimit: 0
+  template:
+    spec:
+      serviceAccountName: wait-job
+      restartPolicy: Never
+      containers:
+        - name: wait
+          image: registry.redhat.io/openshift4/ose-cli:latest
+          env:
+            - name: MIN_INFRA_NODES
+              value: "2"
+          command:
+            - /bin/bash
+            - -c
+            - |
+              MIN_READY="${MIN_INFRA_NODES:-2}"
+              echo "Waiting for at least ${MIN_READY} Ready infra nodes..."
+              until [ "$(oc get nodes -l node-role.kubernetes.io/infra --no-headers 2>/dev/null | grep -c ' Ready ' || true)" -ge "${MIN_READY}" ]; do
+                echo "infra nodes not ready (${MIN_READY} required); sleeping 30s..."
+                sleep 30
+              done
+              oc get nodes -l node-role.kubernetes.io/infra
+              echo "infra nodes ready."

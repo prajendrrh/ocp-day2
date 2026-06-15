@@ -1,0 +1,7 @@
+apiVersion: machine.openshift.io/v1beta1
+kind: MachineSet
+metadata:
+  name: gitops-tfhd4-infra-eu-west-1b
+  namespace: openshift-machine-api
+  annotations:
+    argocd.argoproj.io/sync-wave: "3"

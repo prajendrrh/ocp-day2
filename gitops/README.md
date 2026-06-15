@@ -39,24 +39,24 @@ Tighten `spec.sourceRepos` in `gitops/bootstrap/day2-appproject.yaml` for produc
 
 3. Create the root `Application` once from `gitops/argocd/root-application.yaml` (the bootstrap script does this after Argo CD is ready). It uses the built-in `default` Argo CD project so you do not need `day2-ops` to exist first.
 
-4. With **automated** sync on `day2-root`, child Applications run in order (app sync waves **5 → 30 → 40 → 50 → 60**). Each bundle uses in-app **delay Jobs**—see [`clusters/phased/README.md`](../clusters/phased/README.md).
+4. With **automated** sync on `day2-root`, the child Application **`day2-ordered`** runs the full Day 2 sequence in one sync—see [`clusters/phased/day2-ordered/README.md`](../clusters/phased/day2-ordered/README.md).
 
-### Automated child Applications (default bootstrap)
+### Default bootstrap: `day2-ordered`
 
-`gitops/bootstrap/kustomization.yaml` enables **all** Day 2 apps with `syncPolicy.automated`:
+`gitops/bootstrap/kustomization.yaml` enables **`day2-ordered`** (single Application):
 
-| App wave | Application | Timing inside app |
-|----------|-------------|-------------------|
-| -1 | `day2-argocd-rbac` | Argo CD controller RBAC (cluster-scoped Day 2 APIs) |
-| 5 | `day2-ntp-and-etcd` | NTP → **20 min** → etcd |
-| 30 | `day2-infra-nodes` | MachineSets → **20 min** |
-| 40 | `day2-ingress-on-infra` | Ingress → **10 min** |
-| 50 | `day2-registry-on-infra` | Registry → **10 min** |
-| 60 | `day2-monitoring-on-infra` | Monitoring (final) |
+| Wave | Step |
+|------|------|
+| 1 | NTP MachineConfig |
+| 2 | Wait worker MCP Updated |
+| 3 | Infra MachineSets |
+| 4 | Wait infra nodes Ready |
+| 5 | Ingress + registry + monitoring |
+| 6 | Etcd encryption |
 
-Infra MachineSets target cluster **`gitops-tfhd4`** (`eu-west-1a` / `eu-west-1b`). Edit `clusters/phased/infra-nodes/` if your cluster differs.
+Infra MachineSets target cluster **`gitops-tfhd4`** (`eu-west-1a` / `eu-west-1b`). Edit `clusters/phased/day2-ordered/manifests/` if your cluster differs.
 
-To disable part of the rollout, remove the corresponding line from `gitops/bootstrap/kustomization.yaml` and commit.
+Legacy six-app bootstrap is commented in the same `kustomization.yaml`.
 
 ## Secrets and merge-sensitive resources
 

@@ -1,14 +1,13 @@
 # Renders child Argo CD Applications (app-of-apps). Synced by day2-root Application.
-#
-# Fully automated rollout: all child Applications use syncPolicy.automated and ordered
-# sync-waves with in-app delay Jobs (see clusters/phased/README.md).
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 resources:
   - day2-appproject.yaml
-  - day2-argocd-rbac.yaml
-  - day2-ntp-and-etcd.yaml
-  - day2-infra-nodes.yaml
-  - day2-ingress-on-infra.yaml
-  - day2-registry-on-infra.yaml
-  - day2-monitoring-on-infra.yaml
+  - day2-ordered.yaml
+  # Legacy multi-app rollout (parallel auto-sync). Use instead of day2-ordered if preferred:
+  # - day2-argocd-rbac.yaml
+  # - day2-ntp-and-etcd.yaml
+  # - day2-infra-nodes.yaml
+  # - day2-ingress-on-infra.yaml
+  # - day2-registry-on-infra.yaml
+  # - day2-monitoring-on-infra.yaml

@@ -17,12 +17,12 @@ After the OpenShift GitOps operator is running and **`day2-root`** is applied, A
 
 | Step | Wait before next step |
 |------|------------------------|
-| NTP MachineConfig → etcd encryption | **20 minutes** (worker MCP rollouts) |
-| Infra MachineSets → move ingress | **20 minutes** (node provisioning) |
-| Ingress → registry | **10 minutes** |
-| Registry → monitoring | **10 minutes** |
+| NTP → infra MachineSets | Worker MCP **Updated** (wait Job) |
+| Infra MachineSets → ingress/registry/monitoring | Infra nodes **Ready** (wait Job) |
+| Ingress / registry / monitoring | None (same sync wave) |
+| Workloads → etcd | None (etcd is last wave) |
 
-Details and tuning: [`clusters/phased/README.md`](clusters/phased/README.md).
+Details: [`clusters/phased/day2-ordered/README.md`](clusters/phased/day2-ordered/README.md).
 
 **Caveats:** delay Jobs use `registry.redhat.io/ubi9/ubi-minimal` (must be pullable). Hooks enforce **minimum** wait time—they do not wait for every node reboot or operator condition. Large clusters may need longer `sleep` values in the `delay-*.yaml` Jobs.
 

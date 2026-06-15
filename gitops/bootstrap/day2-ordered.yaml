@@ -1,0 +1,21 @@
+# One Application: NTP → wait MCP → infra → wait Ready → ingress+registry+monitoring → etcd.
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: day2-ordered
+  namespace: openshift-gitops
+  annotations:
+    argocd.argoproj.io/sync-wave: "5"
+spec:
+  project: day2-ops
+  source:
+    repoURL: https://github.com/prajendrrh/ocp-day2.git
+    targetRevision: main
+    path: clusters/phased/day2-ordered
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: openshift-gitops
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true

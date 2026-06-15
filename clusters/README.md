@@ -7,7 +7,8 @@ Each subdirectory is a **self-contained** Kustomize root (manifests stay inside 
 | Path | Applied by | Role |
 |------|------------|------|
 | `argocd-day2-rbac/` | Bootstrap script **and** `day2-argocd-rbac` (wave **-1**) | RBAC for Argo CD application controller |
-| `openshift-gitops-operator/` | Bootstrap script or `oc apply -k` **before** Argo CD exists | OLM install (not in app-of-apps) |
+| `day2-ordered/` | `day2-ordered` (default) | Single-app ordered rollout + 2 wait Jobs |
+| `openshift-gitops-operator/` | Pre-Argo bootstrap | OLM install |
 | `ntp-then-etcd/` | `day2-ntp-and-etcd` | NTP chrony → delay → etcd encryption |
 | `infra-nodes/` | `day2-infra-nodes` | Infra MachineSets → delay |
 | `ingress-on-infra/` | `day2-ingress-on-infra` | Default ingress on infra → delay |

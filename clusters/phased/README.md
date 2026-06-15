@@ -1,54 +1,35 @@
 # Phased GitOps bundles (Argo CD)
 
-Everything under `clusters/phased/` is a **self-contained** Kustomize root. Manifests stay inside each directory so Argo CD does not need `buildOptions: --load-restrictor LoadRestrictionsNone`.
+## Default rollout: `day2-ordered` (one Application)
 
-Delay hook Jobs run in `openshift-gitops` and use `registry.redhat.io/ubi9/ubi-minimal` (cluster must pull from `registry.redhat.io`).
+[`day2-ordered/`](day2-ordered/README.md) applies all Day 2 use cases in **one sync** with **two** inline bash wait Jobs (worker MCP, then infra nodes Ready). Ingress, registry, and monitoring share the same wave; etcd runs last.
 
-## Bundles
+| Wave | Step |
+|------|------|
+| -10 | Argo CD RBAC |
+| 1 | NTP |
+| 2 | Wait worker MCP |
+| 3 | Infra MachineSets |
+| 4 | Wait infra Ready |
+| 5 | Ingress + registry + monitoring |
+| 6 | Etcd encryption |
 
-| Path | How it is applied |
-|------|-------------------|
-| `argocd-day2-rbac/` | Bootstrap script + Argo CD `day2-argocd-rbac` (wave **-1**, before other apps) |
-| `openshift-gitops-operator/` | **Before** Argo CD: `oc apply -k` or bootstrap script. Not in app-of-apps. |
-| `ntp-then-etcd/` | Argo CD `day2-ntp-and-etcd` |
-| `infra-nodes/` | Argo CD `day2-infra-nodes` |
-| `ingress-on-infra/` | Argo CD `day2-ingress-on-infra` |
-| `registry-on-infra/` | Argo CD `day2-registry-on-infra` |
-| `monitoring-on-infra/` | Argo CD `day2-monitoring-on-infra` |
+Bootstrap: `gitops/bootstrap/kustomization.yaml` → `day2-ordered.yaml`.
 
-Keep phased copies in sync with topic folders at the repo root when you edit manifests.
+---
 
-## Application order (`day2-root` child apps)
+## Legacy bundles (multi-app, optional)
 
-| App sync wave | Application | What runs |
-|---------------|-------------|-----------|
-| -1 | `day2-argocd-rbac` | RBAC for application controller (registry, ingress, etc.) |
-| 5 | `day2-ntp-and-etcd` | NTP → **20 min** → etcd encryption |
-| 30 | `day2-infra-nodes` | Infra MachineSets → **20 min** |
-| 40 | `day2-ingress-on-infra` | Ingress on infra → **10 min** |
-| 50 | `day2-registry-on-infra` | Registry on infra → **10 min** |
-| 60 | `day2-monitoring-on-infra` | Monitoring on infra |
+Self-contained Kustomize roots under each folder. Used when bootstrap lists separate `day2-*` Applications (commented out by default). Those apps auto-sync **in parallel**; sleep Jobs only apply inside each app.
 
-## In-application timing
+| Path | Application |
+|------|-------------|
+| `argocd-day2-rbac/` | `day2-argocd-rbac` |
+| `openshift-gitops-operator/` | Pre-Argo bootstrap only |
+| `ntp-then-etcd/` | `day2-ntp-and-etcd` |
+| `infra-nodes/` | `day2-infra-nodes` |
+| `ingress-on-infra/` | `day2-ingress-on-infra` |
+| `registry-on-infra/` | `day2-registry-on-infra` |
+| `monitoring-on-infra/` | `day2-monitoring-on-infra` |
 
-| Bundle | Wave 5 | Wave 10 | Wave 20 |
-|--------|--------|---------|---------|
-| `ntp-then-etcd` | MachineConfig (NTP) | Job sleeps **1200s** (20 min) | APIServer etcd encryption |
-| `infra-nodes` | 2× MachineSet | Job sleeps **1200s** (20 min) | — |
-| `ingress-on-infra` | IngressController | Job sleeps **600s** (10 min) | — |
-| `registry-on-infra` | Image registry Config | Job sleeps **600s** (10 min) | — |
-| `monitoring-on-infra` | cluster-monitoring-config | — | — |
-
-### Why delay NTP → etcd?
-
-The NTP `MachineConfig` triggers a **worker MCP rolling update** (reboots). Etcd encryption is high-impact. The **20-minute** hook gives nodes time to start rolling out chrony before the `APIServer` encryption change is applied. Increase `sleep` in `ntp-then-etcd/delay-after-ntp.yaml` if your worker pool is large.
-
-### Why delay infra → ingress?
-
-MachineSets must **provision** infra nodes and register them Ready. The **20-minute** hook after MachineSets runs before moving the router.
-
-### Tuning delays
-
-Edit the `sleep` value in the relevant `delay-*.yaml` Job under each phased folder, commit, and let Argo CD reconcile.
-
-**Note:** Hooks enforce **minimum wait time**, not full health (for example MCP `UPDATED` or all infra nodes Ready). Watch cluster state in Argo CD and with `oc` during long rollouts.
+Keep copies in sync with topic folders at the repo root when editing manifests.
