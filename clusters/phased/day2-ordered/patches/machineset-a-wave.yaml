@@ -1,7 +1,0 @@
-apiVersion: machine.openshift.io/v1beta1
-kind: MachineSet
-metadata:
-  name: gitops-2c2d8-infra-eu-west-1a
-  namespace: openshift-machine-api
-  annotations:
-    argocd.argoproj.io/sync-wave: "3"
