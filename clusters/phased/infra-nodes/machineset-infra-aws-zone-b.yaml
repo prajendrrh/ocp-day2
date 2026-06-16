@@ -3,8 +3,8 @@ apiVersion: machine.openshift.io/v1beta1
 kind: MachineSet
 metadata:
   labels:
-    machine.openshift.io/cluster-api-cluster: gitops-tfhd4
-  name: gitops-tfhd4-infra-eu-west-1b
+    machine.openshift.io/cluster-api-cluster: gitops-2c2d8
+  name: gitops-2c2d8-infra-eu-west-1b
   namespace: openshift-machine-api
   annotations:
     argocd.argoproj.io/sync-wave: "5"
@@ -12,15 +12,15 @@ spec:
   replicas: 1
   selector:
     matchLabels:
-      machine.openshift.io/cluster-api-cluster: gitops-tfhd4
-      machine.openshift.io/cluster-api-machineset: gitops-tfhd4-infra-eu-west-1b
+      machine.openshift.io/cluster-api-cluster: gitops-2c2d8
+      machine.openshift.io/cluster-api-machineset: gitops-2c2d8-infra-eu-west-1b
   template:
     metadata:
       labels:
-        machine.openshift.io/cluster-api-cluster: gitops-tfhd4
+        machine.openshift.io/cluster-api-cluster: gitops-2c2d8
         machine.openshift.io/cluster-api-machine-role: infra
         machine.openshift.io/cluster-api-machine-type: infra
-        machine.openshift.io/cluster-api-machineset: gitops-tfhd4-infra-eu-west-1b
+        machine.openshift.io/cluster-api-machineset: gitops-2c2d8-infra-eu-west-1b
     spec:
       metadata:
         labels:
@@ -39,7 +39,7 @@ spec:
             name: aws-cloud-credentials
           deviceIndex: 0
           iamInstanceProfile:
-            id: gitops-tfhd4-worker-profile
+            id: gitops-2c2d8-worker-profile
           instanceType: m6i.xlarge
           kind: AWSMachineProviderConfig
           placement:
@@ -49,18 +49,18 @@ spec:
             - filters:
                 - name: tag:Name
                   values:
-                    - gitops-tfhd4-node
+                    - gitops-2c2d8-node
             - filters:
                 - name: tag:Name
                   values:
-                    - gitops-tfhd4-lb
+                    - gitops-2c2d8-lb
           subnet:
             filters:
               - name: tag:Name
                 values:
-                  - gitops-tfhd4-subnet-private-eu-west-1b
+                  - gitops-2c2d8-subnet-private-eu-west-1b
           tags:
-            - name: kubernetes.io/cluster/gitops-tfhd4
+            - name: kubernetes.io/cluster/gitops-2c2d8
               value: owned
           userDataSecret:
             name: worker-user-data

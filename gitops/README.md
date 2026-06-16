@@ -54,7 +54,7 @@ Tighten `spec.sourceRepos` in `gitops/bootstrap/day2-appproject.yaml` for produc
 | 5 | Ingress + registry + monitoring |
 | 6 | Etcd encryption |
 
-Infra MachineSets target cluster **`gitops-tfhd4`** (`eu-west-1a` / `eu-west-1b`). Edit `clusters/phased/day2-ordered/manifests/` if your cluster differs.
+Infra MachineSets target cluster **`gitops-2c2d8`** (`eu-west-1a` / `eu-west-1b`). Edit `clusters/phased/day2-ordered/manifests/` if your cluster differs.
 
 Legacy six-app bootstrap is commented in the same `kustomization.yaml`.
 
