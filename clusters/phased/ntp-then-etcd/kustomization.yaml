@@ -1,7 +1,0 @@
-# MachineConfig (wave 5) → delay 20m (wave 10) → APIServer encryption (wave 20).
-apiVersion: kustomize.config.k8s.io/v1beta1
-kind: Kustomization
-resources:
-  - 99-worker-chrony.yaml
-  - delay-after-ntp.yaml
-  - apiserver-encryption-aesgcm.yaml
