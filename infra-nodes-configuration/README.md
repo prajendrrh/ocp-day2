@@ -23,11 +23,11 @@ oc get nodes -l node-role.kubernetes.io/infra
 
 MachineSets target cluster **`gitops-2c2d8`**, instance type **`m6i.xlarge`**, AMI **`ami-0b8c325b7499597c6`**, private subnets per zone. Edit the YAML if your cluster IDs differ.
 
-If you use GitOps, the same manifests live under **`clusters/phased/infra-nodes/`** (keep both locations in sync).
+If you use GitOps, edit the same settings in **`clusters/phased/day2-ordered/manifests/`** (Argo CD applies those files via `day2-ordered`).
 
 ### 2. GitOps (default)
 
-With **`day2-infra-nodes`** enabled in `gitops/bootstrap/kustomization.yaml` (default), Argo CD applies these MachineSets automatically after NTP/etcd, waits **20 minutes** (delay hook), then the ingress app runs. No `oc apply` required.
+With **`day2-ordered`**, Argo CD applies infra MachineSets at sync wave **3**, after NTP and the worker MCP wait Job, then waits for infra nodes Ready before ingress/registry/monitoring. Edit `clusters/phased/day2-ordered/manifests/machineset-*.yaml`. See [`clusters/phased/day2-ordered/README.md`](../clusters/phased/day2-ordered/README.md).
 
 Optional manual apply:
 

@@ -18,7 +18,7 @@ oc debug node/<any-node> -- chroot /host bash -lc 'chronyc sources -v || true; c
 
 ### 2. Review or change NTP sources (optional)
 
-The manifest uses `pool 2.rhel.pool.ntp.org iburst`. To use another source, edit `99-worker-chrony.yaml` (and the copy under `clusters/phased/ntp-then-etcd/` if you use GitOps), regenerate the base64 `contents.source`, commit, and sync.
+The manifest uses `pool 2.rhel.pool.ntp.org iburst`. To use another source, edit `99-worker-chrony.yaml` and the copy under `clusters/phased/day2-ordered/manifests/`, regenerate the base64 `contents.source`, commit, and sync.
 
 ### 3. Apply the MachineConfig
 

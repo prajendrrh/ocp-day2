@@ -27,7 +27,7 @@ oc get pods -o wide -n openshift-image-registry
 oc apply -f ./imageregistry-cluster.yaml
 ```
 
-If you use GitOps, sync **`day2-registry-on-infra`** only after ingress on infra is validated.
+If you use GitOps, **`day2-ordered`** applies this at sync wave **5** with ingress and monitoring. Edit `clusters/phased/day2-ordered/manifests/imageregistry-cluster.yaml`.
 
 ### 3. Verify
 

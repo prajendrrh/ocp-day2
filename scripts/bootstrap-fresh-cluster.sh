@@ -39,11 +39,7 @@ else
     || oc wait --for=condition=Available deployment -n openshift-gitops --all --timeout=20m
 fi
 
-echo "==> Applying Argo CD RBAC for Day 2 cluster-scoped resources"
-oc apply -k "${ROOT}/clusters/phased/argocd-day2-rbac"
-
-echo "==> Applying root Application (automated Day 2 rollout)"
+echo "==> Applying root Application (day2-ordered via day2-root)"
 oc apply -f "${ROOT}/gitops/argocd/root-application.yaml"
 
-echo "==> Done. Watch: oc get applications.argoproj.io -n openshift-gitops"
-echo "    Argo CD will sync day2-root and all child Applications without manual Sync."
+echo "==> Done. Watch: oc get application day2-ordered -n openshift-gitops"

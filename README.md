@@ -1,72 +1,84 @@
 # PoC — OCP Day 2 Operations
 
-This repository is a structured proof of concept (PoC) for **OpenShift Day 2 operations**.
+OpenShift **Day 2** configuration as code, reconciled by **OpenShift GitOps** (Argo CD).
 
-- **GitOps path (recommended for SSOT):** cluster configuration is **configuration as code**—manifests and Kustomize under `clusters/` and `gitops/`, reconciled by OpenShift GitOps. After the operator is running, **ongoing** Day 2 changes are Git commits only. A small **bootstrap script** (`scripts/bootstrap-fresh-cluster.sh`) is optional glue for a brand-new cluster (install operator, wait, apply root `Application`); it does not replace GitOps for configuration.
-- **Topic runbooks:** optional narrative folders (sometimes with `oc` examples for learning, troubleshooting, or one-off tasks). They are not required when you manage the cluster through GitOps.
+One Application — **`day2-ordered`** — applies NTP, infra nodes, ingress, registry, monitoring, and etcd encryption in a **single ordered sync**, with two readiness wait Jobs between major steps.
 
-## New cluster: fully automated GitOps rollout
+## Repository layout
 
-After the OpenShift GitOps operator is running and **`day2-root`** is applied, Argo CD **automatically** syncs all Day 2 use cases in order—**no manual Sync clicks** and **no `oc apply`** for manifests in this repo.
+```text
+ocp-day2/
+├── clusters/
+│   └── phased/
+│       ├── openshift-gitops-operator/   # Step 0: install GitOps (before Argo exists)
+│       └── day2-ordered/                # All Day 2 YAML + wait Jobs (Argo applies this)
+│           ├── kustomization.yaml
+│           ├── wait-jobs.yaml
+│           ├── wait-job-rbac.yaml
+│           ├── rbac/                    # Argo controller permissions
+│           └── manifests/               # NTP, infra, ingress, registry, monitoring, etcd
+├── gitops/
+│   ├── argocd/root-application.yaml     # day2-root — apply once per cluster
+│   └── bootstrap/                       # day2-appproject + day2-ordered
+├── scripts/bootstrap-fresh-cluster.sh   # Operator → wait → day2-root
+├── openshift-gitops-operator/           # Runbook for operator install
+├── infra-nodes-configuration/           # Runbooks (optional reading)
+├── ingress-on-infra/
+├── registry-on-infra/
+├── monitoring-on-infra/
+├── ntp-chrony-configuration/
+├── etcd-encryption/
+└── topic-template/
+```
 
-1. **Confirm Git remote** — `repoURL` / `targetRevision` default to **`https://github.com/prajendrrh/ocp-day2.git`** and **`main`**.
-2. **Bootstrap (once per cluster):** run [`scripts/bootstrap-fresh-cluster.sh`](scripts/bootstrap-fresh-cluster.sh) or apply `gitops/argocd/root-application.yaml` after the operator is ready.
-3. **Watch** — `oc get applications.argoproj.io -n openshift-gitops` and the Argo CD UI. Total elapsed time includes built-in **delay hooks** (see [timing](#automated-timing) below).
+| Area | Purpose |
+|------|---------|
+| **`clusters/phased/day2-ordered/`** | **Source of truth** for what Argo CD applies |
+| **`gitops/`** | Wires the repo into Argo CD (`day2-root` → `day2-ordered`) |
+| **Topic folders** | Runbooks and docs; edit `day2-ordered/manifests/` for GitOps changes |
 
-### Automated timing
+Details: [`clusters/README.md`](clusters/README.md), [`gitops/README.md`](gitops/README.md).
 
-| Step | Wait before next step |
-|------|------------------------|
-| NTP → infra MachineSets | Worker MCP picked up `99-worker-chrony` and all workers updated/ready (wait Job) |
-| Infra MachineSets → ingress/registry/monitoring | Infra nodes **Ready** (wait Job) |
-| Ingress / registry / monitoring | None (same sync wave) |
-| Workloads → etcd | None (etcd is last wave) |
+## Apply on a fresh cluster
 
-Details: [`clusters/phased/day2-ordered/README.md`](clusters/phased/day2-ordered/README.md).
+### Before you start
 
-**Caveats:** delay Jobs use `registry.redhat.io/ubi9/ubi-minimal` (must be pullable). Hooks enforce **minimum** wait time—they do not wait for every node reboot or operator condition. Large clusters may need longer `sleep` values in the `delay-*.yaml` Jobs.
+1. `oc login` as cluster-admin; set `KUBECONFIG`.
+2. Push this repo to Git; set `repoURL` / `targetRevision` in `gitops/argocd/root-application.yaml` and `gitops/bootstrap/day2-ordered.yaml` if needed.
+3. Customize infra MachineSets in `clusters/phased/day2-ordered/manifests/machineset-*.yaml` for your cluster (default: **`gitops-2c2d8`**, **eu-west-1a/b**).
 
-## Environment
+### Bootstrap
 
-- OpenShift: (fill in once chosen)
-- Access: cluster-admin (recommended for most Day 2 tasks)
-- CLI tools: `oc`, `kubectl` (optional), `jq` (optional)
+```bash
+cd /path/to/ocp-day2
+./scripts/bootstrap-fresh-cluster.sh
+```
 
-## Repo map (topics)
+Or manually: install operator → wait for Argo CD → `oc apply -f gitops/argocd/root-application.yaml`.
 
-Topic folders use **descriptive names** (no numeric prefixes). For a new cluster, start with **OpenShift GitOps operator**, then use GitOps for the rest.
+### Watch
 
-| Folder | Summary |
-|--------|---------|
-| [`openshift-gitops-operator/`](openshift-gitops-operator/README.md) | Install the Red Hat OpenShift GitOps operator (OLM); do this **first** on a new cluster |
-| [`infra-nodes-configuration/`](infra-nodes-configuration/README.md) | Create ≥ 2 infrastructure nodes (MachineSet); **first** infra step |
-| [`ingress-on-infra/`](ingress-on-infra/README.md) | Move default ingress router to infra nodes |
-| [`registry-on-infra/`](registry-on-infra/README.md) | Move integrated image registry to infra nodes |
-| [`monitoring-on-infra/`](monitoring-on-infra/README.md) | Move cluster monitoring to infra nodes |
-| [`ntp-chrony-configuration/`](ntp-chrony-configuration/README.md) | NTP (chrony) via MachineConfig |
-| [`etcd-encryption/`](etcd-encryption/README.md) | Etcd encryption at rest |
-| [`topic-template/`](topic-template/README.md) | Copy as a starting point for new topics |
-| [`clusters/phased/`](clusters/phased/README.md) | Self-contained Kustomize bundles for GitOps (all Day 2 use cases) |
-| [`gitops/`](gitops/README.md) | Argo CD `Application` and `AppProject` manifests |
+```bash
+oc get application day2-ordered -n openshift-gitops
+oc get jobs -n openshift-gitops | grep wait-for
+```
 
-Each topic folder should contain:
+Full steps and wave table: [`clusters/phased/day2-ordered/README.md`](clusters/phased/day2-ordered/README.md).
 
-- `README.md` with prerequisites, a numbered procedure, and expected output
-- Minimal YAML manifests (only when required), stored alongside the README (no `manifests/` subfolder)
+## Rollout order
 
-## GitOps (single source of truth)
+| After | Wait |
+|-------|------|
+| NTP applied | Worker MCP ready (wait Job) |
+| Infra MachineSets applied | Infra nodes Ready (wait Job) |
+| Ingress + registry + monitoring | No wait (same wave) |
+| Then | Etcd encryption (last) |
 
-All cluster manifests consumed by Argo CD live under **`clusters/phased/`** (self-contained Kustomize bundles). Topic folders at the repo root are **runbooks** and authoring references—when you change YAML there, update the matching copy under `clusters/phased/<bundle>/`. Bootstrap and layout: [`gitops/README.md`](gitops/README.md), [`clusters/README.md`](clusters/README.md).
+## Ongoing changes
 
-## Quick start
-
-**New cluster:** follow **New cluster: fully automated GitOps rollout** above, then [`gitops/README.md`](gitops/README.md).
-
-**Runbook (optional):** open any topic folder and follow its `README.md` for a guided walkthrough.
+Edit `clusters/phased/day2-ordered/manifests/`, commit, push — Argo CD syncs automatically.
 
 ## Conventions
 
-- All docs are in English.
-- Prefer declarative resources (YAML) over manual imperative steps when possible.
-- For GitOps, treat sensitive values with cluster-side patterns that are still declarative at the edge (for example Sealed Secrets, External Secrets Operator, or CSI driver volume mounts)—not checked-in shell that mutates the cluster.
-- Include official documentation links for every operator/API/feature used: `https://docs.redhat.com` or `https://docs.openshift.com`.
+- Docs in English; prefer declarative YAML over manual `oc apply` for managed resources.
+- Official links: [docs.redhat.com](https://docs.redhat.com), [docs.openshift.com](https://docs.openshift.com).

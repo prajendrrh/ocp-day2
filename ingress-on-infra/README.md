@@ -24,7 +24,7 @@ oc get pod -n openshift-ingress -o wide
 oc apply -f ./ingresscontroller-default.yaml
 ```
 
-If you use GitOps, sync **`day2-ingress-on-infra`** only after infra nodes are validated.
+If you use GitOps, **`day2-ordered`** applies this at sync wave **5** after infra nodes are ready. Edit `clusters/phased/day2-ordered/manifests/ingresscontroller-default.yaml`.
 
 ### 3. Verify
 

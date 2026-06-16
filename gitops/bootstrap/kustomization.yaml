@@ -4,10 +4,3 @@ kind: Kustomization
 resources:
   - day2-appproject.yaml
   - day2-ordered.yaml
-  # Legacy multi-app rollout (parallel auto-sync). Use instead of day2-ordered if preferred:
-  # - day2-argocd-rbac.yaml
-  # - day2-ntp-and-etcd.yaml
-  # - day2-infra-nodes.yaml
-  # - day2-ingress-on-infra.yaml
-  # - day2-registry-on-infra.yaml
-  # - day2-monitoring-on-infra.yaml

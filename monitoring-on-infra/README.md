@@ -30,7 +30,7 @@ If it does not exist, applying `cluster-monitoring-config.yaml` creates it.
 oc apply -f ./cluster-monitoring-config.yaml
 ```
 
-If you use GitOps, sync **`day2-monitoring-on-infra`** only after registry on infra is validated.
+If you use GitOps, **`day2-ordered`** applies this at sync wave **5** with ingress and registry. Edit `clusters/phased/day2-ordered/manifests/cluster-monitoring-config.yaml`.
 
 ### 3. Watch pods reschedule
 

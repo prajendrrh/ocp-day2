@@ -6,6 +6,8 @@ metadata:
     machine.openshift.io/cluster-api-cluster: gitops-2c2d8
   name: gitops-2c2d8-infra-eu-west-1b
   namespace: openshift-machine-api
+  annotations:
+    argocd.argoproj.io/sync-wave: "3"
 spec:
   replicas: 1
   selector:
